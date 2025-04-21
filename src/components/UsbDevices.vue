@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { deviceGetMtpEndpoints, type DeviceWithMtp } from '~/lib/webUsb'
+import { deviceGetMtpEndpoints, deviceSendCommand, deviceSendMinimalCommand, type DeviceWithMtp } from '~/lib/webUsb'
 
 const usbDevicesData = await useAsyncData<USBDevice[]>(() => window.navigator.usb.getDevices())
 
@@ -20,7 +20,8 @@ const connectTest = async () => {
     return
   }
 
-  // TODO
+  await deviceSendCommand(deviceWithMtp.value, { operationCode: 'GetDeviceInfo' })
+  // await deviceSendMinimalCommand(deviceWithMtp.value)
 }
 
 watchEffect(() => {
