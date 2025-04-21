@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import UsbDevices from '~/components/UsbDevices.vue'
+import AdbDeviceSelect from '~/components/AdbDeviceSelect.vue'
+import AdbHandlerProvider from '~/components/AdbHandlerProvider.vue'
 import LayoutMain from './_partial/LayoutMain.vue'
 </script>
 
 <template>
   <LayoutMain>
-    <ClientOnly>
-      <UsbDevices />
-    </ClientOnly>
+    <AdbHandlerProvider>
+      <AdbDeviceSelect />
+    </AdbHandlerProvider>
   </LayoutMain>
 </template>

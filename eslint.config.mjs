@@ -6,6 +6,7 @@ export default withNuxt([
   {
     rules: {
       'no-unused-vars': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': 'warn',
     },
   },
@@ -13,6 +14,7 @@ export default withNuxt([
     files: ['src/**/*.vue'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
+      'vue/attribute-hyphenation': 'off',
       'vue/no-multiple-template-root': 'off',
     },
   },
