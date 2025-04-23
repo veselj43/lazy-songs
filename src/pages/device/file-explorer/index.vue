@@ -1,0 +1,18 @@
+<script setup lang="ts">
+import AdbProvider from '~/components/AdbProvider.vue'
+import { middlewareAdbDeviceCheck } from '~/pages/_partial/adb.middleware'
+import LayoutMain from '../../_partial/LayoutMain.vue'
+import AdbFileExplorer from './_partial/AdbFileExplorer.vue'
+
+definePageMeta({
+  middleware: [middlewareAdbDeviceCheck],
+})
+</script>
+
+<template>
+  <LayoutMain>
+    <AdbProvider>
+      <AdbFileExplorer />
+    </AdbProvider>
+  </LayoutMain>
+</template>

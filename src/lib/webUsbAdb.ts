@@ -1,4 +1,4 @@
-import { Adb, AdbDaemonTransport } from '@yume-chan/adb'
+import { Adb, AdbDaemonTransport, type AdbSync } from '@yume-chan/adb'
 import AdbWebCredentialStore from '@yume-chan/adb-credential-web'
 import { AdbDaemonWebUsbDevice, AdbDaemonWebUsbDeviceManager } from '@yume-chan/adb-daemon-webusb'
 import { tryCatch } from './error'
@@ -82,9 +82,11 @@ export class AdbHandler {
     }
 
     const adb = new Adb(transport)
-
-    console.log(adb.deviceFeatures)
-
     return adb
   }
+}
+
+export const adbSyncPathExists = async (sync: AdbSync, path: string) => {
+  const { error: statErr } = await tryCatch(sync.stat(path))
+  return !statErr
 }

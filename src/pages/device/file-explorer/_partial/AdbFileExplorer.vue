@@ -1,10 +1,17 @@
 <script setup lang="ts">
 import { USkeleton } from '#components'
+import { decodeUtf8 } from '@yume-chan/adb'
+import AppHeader from '~/components/AppHeader.vue'
 import { getFileType, type DirEntry, type FileType } from '~/lib/linuxUtils'
+import { streamReadToBytes } from '~/lib/stream'
 import { injectAdbCurrent } from '~/service/adb.provider'
-import AppHeader from './AppHeader.vue'
+import { PATH_SEP, pathJoin } from '~/service/path.service'
+import { useConfigStore } from '~/store/config'
 
 const adb = injectAdbCurrent()
+const sync = await adb.value.sync()
+
+const storeConfig = useConfigStore()
 
 const entryTypeToIcon: Record<FileType, string> = {
   dir: 'i-solar:folder-bold-duotone',
@@ -12,14 +19,11 @@ const entryTypeToIcon: Record<FileType, string> = {
   link: 'i-solar:link-square-line-duotone',
 }
 
-const sync = await adb.value.sync()
-
-const dirPathCurrent = ref('/')
+const dirPathCurrent = ref(storeConfig.pathSongs)
 
 const dirItems = await useAsyncData(
   async () => {
     const result = await sync.readdir(dirPathCurrent.value)
-    // console.log(dirPathCurrent.value, result)
     return result
   },
   {
@@ -59,7 +63,7 @@ const dirEntrySelect = (dirEntry: DirEntry) => {
     return
   }
 
-  const pathSegments = dirPathCurrent.value.split('/').filter((segment) => !!segment)
+  const pathSegments = dirPathCurrent.value.split(PATH_SEP).filter((segment) => !!segment)
 
   if (dirEntry.name === '..') {
     pathSegments.pop()
@@ -67,8 +71,25 @@ const dirEntrySelect = (dirEntry: DirEntry) => {
     pathSegments.push(dirEntry.name)
   }
 
-  const pathNew = '/' + pathSegments.join('/')
+  const pathNew = pathJoin('/', ...pathSegments)
   dirPathCurrent.value = pathNew
+}
+
+const filePreview = shallowRef<{ name: string; content: string }>()
+const filePreviewOpen = ref(false)
+
+const fileRead = async (dirEntry: DirEntry) => {
+  const pathFull = pathJoin(dirPathCurrent.value, dirEntry.name)
+
+  const reader = sync.read(pathFull)
+  const bytes = await streamReadToBytes(reader)
+  const text = decodeUtf8(bytes)
+
+  filePreview.value = {
+    name: pathFull,
+    content: text,
+  }
+  filePreviewOpen.value = true
 }
 </script>
 
@@ -130,22 +151,45 @@ const dirEntrySelect = (dirEntry: DirEntry) => {
             >
               {{ entry.size }}
             </td>
+            <td>
+              <div class="flex items-center">
+                <UButton
+                  v-if="entry.type === 'file'"
+                  class="cursor-pointer"
+                  size="sm"
+                  @click="fileRead(entry)"
+                  >Read</UButton
+                >
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
 
     <div v-else-if="dirItems.status.value === 'pending'">
-      <div class="flex flex-col gap-2">
+      <div class="mt-6 flex w-full flex-col gap-2">
         <div
           v-for="(x, i) in Array(5).fill(0)"
           :key="i"
           class="flex items-center gap-4 px-2 py-1"
         >
           <USkeleton class="size-4 rounded-md" />
-          <USkeleton class="h-4 w-2xs" />
+          <USkeleton class="h-4 w-full" />
         </div>
       </div>
     </div>
+
+    <UModal
+      v-model:open="filePreviewOpen"
+      fullscreen
+      :title="`File preview: ${filePreview?.name}`"
+    >
+      <template #body>
+        <div>
+          <pre>{{ filePreview?.content }}</pre>
+        </div>
+      </template>
+    </UModal>
   </div>
 </template>

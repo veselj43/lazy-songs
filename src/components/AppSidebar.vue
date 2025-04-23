@@ -5,14 +5,21 @@ import type { NavigationMenuItem } from '@nuxt/ui'
 const items = ref<NavigationMenuItem[][]>([
   [
     {
-      label: 'Device select',
-      icon: 'i-solar:usb-bold',
-      to: '/',
+      label: 'Song manager',
+      icon: 'i-solar:music-library-linear',
+      to: '/device/song-manager',
     },
     {
       label: 'File explorer',
       icon: 'i-solar:file-linear',
-      to: '/file-explorer',
+      to: '/device/file-explorer',
+    },
+  ],
+  [
+    {
+      label: 'Playground',
+      icon: 'i-solar:window-frame-linear',
+      to: '/device/playground',
     },
   ],
 ])

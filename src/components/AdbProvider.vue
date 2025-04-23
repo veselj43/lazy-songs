@@ -9,15 +9,13 @@ provideAdbCurrent(deviceAdb)
 </script>
 
 <template>
-  <ClientOnly>
-    <div v-if="!deviceAdb">
-      <UAlert
-        color="error"
-        variant="soft"
-        title="Select your device first."
-      />
-    </div>
+  <div v-if="!deviceAdb">
+    <UAlert
+      color="error"
+      variant="soft"
+      title="Select your device first."
+    />
+  </div>
 
-    <slot v-else />
-  </ClientOnly>
+  <slot v-else />
 </template>

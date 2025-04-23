@@ -10,15 +10,13 @@ if (storeAdb.handler) {
 </script>
 
 <template>
-  <ClientOnly>
-    <div v-if="!storeAdb.handler">
-      <UAlert
-        color="error"
-        variant="soft"
-        title="Unable to find USB interface. Your browser probably doesn't support it."
-      />
-    </div>
+  <div v-if="!storeAdb.handler">
+    <UAlert
+      color="error"
+      variant="soft"
+      title="Unable to find USB interface. Your browser probably doesn't support it."
+    />
+  </div>
 
-    <slot v-else />
-  </ClientOnly>
+  <slot v-else />
 </template>

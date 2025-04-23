@@ -53,7 +53,7 @@ export const useAdbStore = defineStore('adb', () => {
     }
   }
 
-  const deviceSelect = (val?: AdbDeviceUiItem) => {
+  const deviceSelect = async (val?: AdbDeviceUiItem) => {
     const adb = deviceAdb.value
     if (adb && adb.serial !== val?.serial) {
       adb.close()
@@ -62,7 +62,7 @@ export const useAdbStore = defineStore('adb', () => {
     device.value = val
 
     if (val) {
-      deviceConnect()
+      await deviceConnect()
     }
   }
 
