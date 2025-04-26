@@ -1,6 +1,5 @@
-import type { Adb } from '@yume-chan/adb'
 import type { ShallowRef } from 'vue'
-import type { AdbHandler } from '~/lib/webUsbAdb'
+import type { AdbHandler, AdbSingleton } from '~/lib/webUsbAdb'
 
 const KEY_ADB_HANDLER = 'adbHandler'
 
@@ -20,12 +19,12 @@ export const injectAdbHandler = () => {
 
 const KEY_ADB_CURRENT = 'adbCurrent'
 
-export const provideAdbCurrent = (abd: ShallowRef<Adb | undefined>) => {
+export const provideAdbCurrent = (abd: ShallowRef<AdbSingleton | undefined>) => {
   provide(KEY_ADB_CURRENT, abd)
 }
 
 export const injectAdbCurrent = () => {
-  const adbHandler = inject<ShallowRef<Adb>>(KEY_ADB_CURRENT)
+  const adbHandler = inject<ShallowRef<AdbSingleton>>(KEY_ADB_CURRENT)
 
   if (!adbHandler) {
     throw Error(`Using ${injectAdbCurrent.name} outside of provider`)

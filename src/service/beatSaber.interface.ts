@@ -1,31 +1,37 @@
-export type SongHash = string
+import { z } from 'zod'
 
-export interface BeatSaberPlaylistSong {
-  hash: SongHash
-  songName: string
-}
+export const schemaSongHash = z.string()
+export type SongHash = z.infer<typeof schemaSongHash>
 
-export interface BeatSaberPlaylist {
-  playlistDescription: string | null
-  playlistAuthor: string | null
-  playlistTitle: string
-  songs: BeatSaberPlaylistSong[]
-  imageString: string
-}
+export const schemaBeatSabePlaylistSong = z.object({
+  hash: schemaSongHash,
+  songName: z.string(),
+})
+export type BeatSaberPlaylistSong = z.infer<typeof schemaBeatSabePlaylistSong>
 
-export interface BeatSaberSongInfo {
-  _version: string
-  _songName: string
-  _songSubName: string
-  _songAuthorName: string
-  _levelAuthorName: string
-  _beatsPerMinute: number
-  _shuffle: number
-  _shufflePeriod: number
-  _previewStartTime: number
-  _previewDuration: string
-  _songFilename: string
-  _coverImageFilename: string
-  _environmentName: string
-  _songTimeOffset: number
-}
+export const schemaBeatSaberPlaylist = z.object({
+  playlistDescription: z.string().optional(),
+  playlistAuthor: z.string().optional(),
+  playlistTitle: z.string(),
+  songs: z.array(schemaBeatSabePlaylistSong),
+  imageString: z.string().optional(),
+})
+export type BeatSaberPlaylist = z.infer<typeof schemaBeatSaberPlaylist>
+
+export const schemaBeatSaberSongInfo = z.object({
+  _version: z.string(),
+  _songName: z.string(),
+  _songSubName: z.string(),
+  _songAuthorName: z.string(),
+  _levelAuthorName: z.string(),
+  _beatsPerMinute: z.number(),
+  _shuffle: z.number(),
+  _shufflePeriod: z.number(),
+  _previewStartTime: z.number(),
+  _previewDuration: z.string(),
+  _songFilename: z.string(),
+  _coverImageFilename: z.string(),
+  _environmentName: z.string(),
+  _songTimeOffset: z.number(),
+})
+export type BeatSaberSongInfo = z.infer<typeof schemaBeatSaberSongInfo>

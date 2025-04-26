@@ -86,7 +86,35 @@ export class AdbHandler {
   }
 }
 
-export const adbSyncPathExists = async (sync: AdbSync, path: string) => {
-  const { error: statErr } = await tryCatch(sync.stat(path))
-  return !statErr
+export class AdbSingleton {
+  private static instance: AdbSingleton
+
+  static async from(adb: Adb) {
+    if (AdbSingleton.instance) {
+      if (AdbSingleton.instance.adb.serial === adb.serial) {
+        return AdbSingleton.instance
+      }
+
+      await AdbSingleton.instance.adb.close()
+    }
+
+    return new AdbSingleton(adb)
+  }
+
+  private syncSingleton: AdbSync | undefined
+
+  private constructor(readonly adb: Adb) {}
+
+  async sync() {
+    if (!this.syncSingleton) {
+      this.syncSingleton = await this.adb.sync()
+    }
+    return this.syncSingleton
+  }
+
+  async pathExists(path: string) {
+    const sync = await this.sync()
+    const { error: statErr } = await tryCatch(sync.stat(path))
+    return !statErr
+  }
 }

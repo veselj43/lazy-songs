@@ -1,9 +1,9 @@
-import { PATH_TEST_SONGS } from '~/service/dev.constant'
-
 export const useConfigStore = defineStore('config', () => {
-  const pathSongs = ref(PATH_TEST_SONGS)
+  const pathSongs = ref('/storage/self/primary/_test/songs')
+  const pathPlaylists = ref('/storage/self/primary/_test/playlists')
 
   return {
     pathSongs,
+    pathPlaylists,
   }
 })

@@ -94,7 +94,7 @@ const fileRead = async (dirEntry: DirEntry) => {
 </script>
 
 <template>
-  <div class="flex max-h-[90vh] flex-col">
+  <div class="flex max-h-full flex-col">
     <AppHeader>
       <template #left>
         <h1 class="text-3xl">Files</h1>

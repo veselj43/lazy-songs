@@ -22,7 +22,7 @@ const deviceSelect = async (_device?: AdbDeviceUiItem) => {
   await storeAdb.deviceSelect(device)
 
   if (storeAdb.deviceAdb) {
-    router.push('/device/song-manager')
+    router.push('/device/download-songs')
   }
 }
 </script>

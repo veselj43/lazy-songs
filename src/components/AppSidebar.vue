@@ -5,6 +5,11 @@ import type { NavigationMenuItem } from '@nuxt/ui'
 const items = ref<NavigationMenuItem[][]>([
   [
     {
+      label: 'Download songs',
+      icon: 'i-solar:download-square-linear',
+      to: '/device/download-songs',
+    },
+    {
       label: 'Song manager',
       icon: 'i-solar:music-library-linear',
       to: '/device/song-manager',
@@ -13,13 +18,6 @@ const items = ref<NavigationMenuItem[][]>([
       label: 'File explorer',
       icon: 'i-solar:file-linear',
       to: '/device/file-explorer',
-    },
-  ],
-  [
-    {
-      label: 'Playground',
-      icon: 'i-solar:window-frame-linear',
-      to: '/device/playground',
     },
   ],
 ])

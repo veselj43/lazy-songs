@@ -1,12 +1,11 @@
-import type { Adb } from '@yume-chan/adb'
 import { tryCatch } from '~/lib/error'
-import { AdbHandler, type AdbDeviceUiItem } from '~/lib/webUsbAdb'
+import { AdbHandler, AdbSingleton, type AdbDeviceUiItem } from '~/lib/webUsbAdb'
 
 export const useAdbStore = defineStore('adb', () => {
   const handler = shallowRef(AdbHandler.init())
 
   const device = shallowRef<AdbDeviceUiItem>()
-  const deviceAdb = shallowRef<Adb>()
+  const deviceAdb = shallowRef<AdbSingleton>()
 
   const deviceConnectState = ref<
     'initial' | 'pending' | 'authorizationWait' | 'authorizationError' | 'authorizationSuccess' | 'error' | 'open'
@@ -48,13 +47,13 @@ export const useAdbStore = defineStore('adb', () => {
         return
       }
 
-      deviceAdb.value = adb
+      deviceAdb.value = await AdbSingleton.from(adb)
       deviceConnectState.value = 'open'
     }
   }
 
   const deviceSelect = async (val?: AdbDeviceUiItem) => {
-    const adb = deviceAdb.value
+    const adb = deviceAdb.value?.adb
     if (adb && adb.serial !== val?.serial) {
       adb.close()
     }

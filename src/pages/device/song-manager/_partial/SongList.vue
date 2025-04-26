@@ -48,13 +48,12 @@ const songsDirFilesWithInfo = useAsyncData(
 </script>
 
 <template>
-  <div>
+  <div class="flex max-h-full flex-col">
     <AppHeader>
-      <template #left>
-        <h2 class="mb-4 text-2xl">Songs</h2>
-      </template>
+      <template #default>Songs</template>
       <template #right>
         <UButton
+          class="cursor-pointer text-base"
           icon="i-solar:refresh-linear"
           variant="ghost"
           @click="songsDirEntries.refresh()"
@@ -62,21 +61,40 @@ const songsDirFilesWithInfo = useAsyncData(
       </template>
     </AppHeader>
 
-    <div class="w-full">
+    <div class="w-full overflow-y-auto">
       <table
         v-if="songsDirFilesWithInfo.status.value === 'success'"
         class="w-full"
       >
+        <thead>
+          <tr>
+            <th class="px-1 py-1 text-left">Song name</th>
+            <th class="px-1 py-1 text-left">Map author</th>
+          </tr>
+        </thead>
         <tbody>
           <tr
             v-for="song in songsDirFilesWithInfo.data.value"
             :key="song.dirEntry.name"
           >
-            <td>{{ song.info._songAuthorName }} - {{ song.info._songName }}</td>
-            <td>{{ song.info._levelAuthorName }}</td>
+            <td class="px-1 py-0.5">{{ song.info._songAuthorName }} - {{ song.info._songName }}</td>
+            <td class="px-1 py-0.5">{{ song.info._levelAuthorName }}</td>
           </tr>
         </tbody>
       </table>
+
+      <div v-else-if="songsDirFilesWithInfo.status.value === 'pending'">
+        <div class="mt-6 flex w-full flex-col gap-2">
+          <div
+            v-for="(x, i) in Array(5).fill(0)"
+            :key="i"
+            class="flex items-center gap-4 px-2 py-1"
+          >
+            <USkeleton class="h-4 w-2/3" />
+            <USkeleton class="h-4 w-1/3" />
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>

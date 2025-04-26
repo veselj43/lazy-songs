@@ -2,7 +2,6 @@
 import AdbProvider from '~/components/AdbProvider.vue'
 import { middlewareAdbDeviceCheck } from '~/pages/_partial/adb.middleware'
 import LayoutMain from '~/pages/_partial/LayoutMain.vue'
-import PlaylistUpload from './_partial/PlaylistUpload.vue'
 import SongList from './_partial/SongList.vue'
 
 definePageMeta({
@@ -11,13 +10,9 @@ definePageMeta({
 </script>
 
 <template>
-  <LayoutMain width="wide">
+  <LayoutMain>
     <AdbProvider>
-      <div class="m-10 grid grid-cols-2 gap-10">
-        <SongList />
-
-        <PlaylistUpload />
-      </div>
+      <SongList />
     </AdbProvider>
   </LayoutMain>
 </template>
