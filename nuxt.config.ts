@@ -3,7 +3,8 @@ import type { NuxtPage } from 'nuxt/schema'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
-  devtools: { enabled: true },
+
+  ssr: false,
 
   modules: [
     //
@@ -11,11 +12,16 @@ export default defineNuxtConfig({
     '@nuxt/icon',
     '@nuxt/test-utils',
     '@nuxt/ui',
+    '@pinia/nuxt',
   ],
 
   css: ['~/assets/css/main.css'],
 
   srcDir: 'src/',
+
+  components: {
+    global: false,
+  },
 
   experimental: {
     typedPages: true,
@@ -39,4 +45,6 @@ export default defineNuxtConfig({
       removePartialPages(pages)
     },
   },
+
+  devtools: { enabled: true },
 })
