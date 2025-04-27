@@ -8,27 +8,31 @@ defineProps<{
 const downloadSongStateToIcon: Record<DownloadSongStatus, { icon: string; class?: string }> = {
   initial: {
     class: 'text-neutral-400',
-    icon: 'i-solar:hashtag-square-linear',
+    icon: 'i-lucide:circle-dashed',
+  },
+  toDownload: {
+    class: 'text-neutral-300',
+    icon: 'i-lucide:circle',
   },
   download: {
     class: 'text-info-300',
-    icon: 'i-solar:download-square-linear',
+    icon: 'i-lucide:circle-arrow-down',
   },
   unzip: {
     class: 'text-info-300',
-    icon: 'i-solar:zip-file-linear',
+    icon: 'i-lucide:circle-dot',
   },
   copy: {
     class: 'text-info-300',
-    icon: 'i-solar:send-square-linear',
+    icon: 'i-lucide:circle-arrow-left',
   },
   done: {
     class: 'text-success-300',
-    icon: 'i-solar:check-square-linear',
+    icon: 'i-lucide:circle-check',
   },
   error: {
     class: 'text-error-300',
-    icon: 'i-solar:close-square-linear',
+    icon: 'i-lucide:circle-x',
   },
 }
 </script>

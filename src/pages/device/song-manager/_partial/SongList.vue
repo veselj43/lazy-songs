@@ -1,18 +1,31 @@
 <script setup lang="ts">
-import { decodeUtf8, LinuxFileType } from '@yume-chan/adb'
+import { UCheckbox } from '#components'
+import type { TableColumn } from '@nuxt/ui'
+import { decodeUtf8, LinuxFileType, type AdbSyncEntry } from '@yume-chan/adb'
 import AppHeader from '~/components/AppHeader.vue'
+import AppModalConfirm from '~/components/AppModalConfirm.vue'
 import { streamReadToBytes } from '~/lib/stream'
 import { injectAdbCurrent } from '~/service/adb.provider'
 import type { BeatSaberSongInfo } from '~/service/beatSaber.interface'
 import { pathJoin } from '~/service/path.service'
 import { useConfigStore } from '~/store/config'
+import { useSongManagerStore } from '~/store/songManager'
+
+const storeSongManager = useSongManagerStore()
+const storeConfig = useConfigStore()
 
 const adb = injectAdbCurrent()
 const sync = await adb.value.sync()
 
-const storeConfig = useConfigStore()
+const table = useTemplateRef('table')
 
 const songsDirEntries = useAsyncData('songDirEntries', () => sync.readdir(storeConfig.pathSongs))
+
+interface SongWithInfo {
+  dirEntry: AdbSyncEntry
+  info: BeatSaberSongInfo
+  songTitle: string
+}
 
 const songsDirFilesWithInfo = useAsyncData(
   'songsDirFilesWithInfo',
@@ -21,7 +34,7 @@ const songsDirFilesWithInfo = useAsyncData(
       return []
     }
 
-    const songsWithInfo = []
+    const songsWithInfo: SongWithInfo[] = []
 
     for (const songEntry of songsDirEntries.data.value) {
       if (songEntry.type !== LinuxFileType.Directory) continue
@@ -34,8 +47,9 @@ const songsDirFilesWithInfo = useAsyncData(
       const info = JSON.parse(text) as BeatSaberSongInfo
 
       songsWithInfo.push({
-        dirEntry: songEntry,
+        dirEntry: markRaw(songEntry),
         info,
+        songTitle: `${info._songAuthorName} - ${info._songName}`,
       })
     }
 
@@ -45,10 +59,70 @@ const songsDirFilesWithInfo = useAsyncData(
     watch: [songsDirEntries.data],
   },
 )
+
+const columns: TableColumn<SongWithInfo>[] = [
+  {
+    id: 'select',
+    header: ({ table }) =>
+      h(UCheckbox, {
+        modelValue: table.getIsSomePageRowsSelected() ? 'indeterminate' : table.getIsAllPageRowsSelected(),
+        'onUpdate:modelValue': (value: boolean | 'indeterminate') => table.toggleAllPageRowsSelected(!!value),
+        'aria-label': 'Select all',
+      }),
+    cell: ({ row }) =>
+      h(UCheckbox, {
+        modelValue: row.getIsSelected(),
+        'onUpdate:modelValue': (value: boolean | 'indeterminate') => row.toggleSelected(!!value),
+        'aria-label': 'Select row',
+      }),
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: 'songTitle',
+    header: 'Song title',
+  },
+  {
+    accessorKey: 'songAuthor',
+    header: 'Map author',
+    cell: ({ row }) => {
+      const songInfo = row.original.info
+      return songInfo._levelAuthorName
+    },
+  },
+]
+
+const songRemoveAction = useAsyncData(
+  'songsRemove',
+  async () => {
+    const songDirs = table.value?.tableApi.getSelectedRowModel()?.rows
+    if (!songDirs) return
+
+    for (const songDir of songDirs) {
+      await storeSongManager.songRemove((songDir.original as SongWithInfo).dirEntry)
+    }
+  },
+  {
+    immediate: false,
+  },
+)
+
+const modalConfirm = useTemplateRef('modalConfirm')
+
+const songRemoveSelected = async () => {
+  if (!modalConfirm.value) return
+
+  const isConfirmed = await modalConfirm.value.open()
+  if (!isConfirmed) return
+
+  await songRemoveAction.execute()
+  await songsDirEntries.refresh()
+  table.value?.tableApi.resetRowSelection()
+}
 </script>
 
 <template>
-  <div class="flex max-h-full flex-col">
+  <div class="flex max-h-full flex-col gap-2">
     <AppHeader>
       <template #default>Songs</template>
       <template #right>
@@ -61,40 +135,41 @@ const songsDirFilesWithInfo = useAsyncData(
       </template>
     </AppHeader>
 
-    <div class="w-full overflow-y-auto">
-      <table
-        v-if="songsDirFilesWithInfo.status.value === 'success'"
-        class="w-full"
-      >
-        <thead>
-          <tr>
-            <th class="px-1 py-1 text-left">Song name</th>
-            <th class="px-1 py-1 text-left">Map author</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="song in songsDirFilesWithInfo.data.value"
-            :key="song.dirEntry.name"
-          >
-            <td class="px-1 py-0.5">{{ song.info._songAuthorName }} - {{ song.info._songName }}</td>
-            <td class="px-1 py-0.5">{{ song.info._levelAuthorName }}</td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="flex items-center justify-between gap-2">
+      <UInput
+        class="max-w-sm min-w-[25ch]"
+        placeholder="Filter songs..."
+        :modelValue="table?.tableApi?.getColumn('songTitle')?.getFilterValue() as string"
+        @update:modelValue="table?.tableApi?.getColumn('songTitle')?.setFilterValue($event)"
+      />
 
-      <div v-else-if="songsDirFilesWithInfo.status.value === 'pending'">
-        <div class="mt-6 flex w-full flex-col gap-2">
-          <div
-            v-for="(x, i) in Array(5).fill(0)"
-            :key="i"
-            class="flex items-center gap-4 px-2 py-1"
-          >
-            <USkeleton class="h-4 w-2/3" />
-            <USkeleton class="h-4 w-1/3" />
-          </div>
-        </div>
+      <div>
+        <UButton
+          variant="subtle"
+          color="error"
+          icon="i-lucide:x"
+          :loading="songRemoveAction.status.value === 'pending'"
+          @click="songRemoveSelected()"
+          >Remove selected</UButton
+        >
       </div>
     </div>
+
+    <UTable
+      ref="table"
+      :data="songsDirFilesWithInfo.data.value ?? undefined"
+      :columns="columns"
+      sticky
+      :loading="songsDirFilesWithInfo.status.value === 'pending'"
+    >
+      <template #expanded="{ row }">
+        <pre>{{ row.original }}</pre>
+      </template>
+    </UTable>
+
+    <AppModalConfirm
+      ref="modalConfirm"
+      title="Do you want to remove selected songs?"
+    />
   </div>
 </template>

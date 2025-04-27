@@ -16,39 +16,45 @@ const createAction = useAsyncData('playlistCreate', () => storePlaylist.create()
   immediate: false,
 })
 
-const playlistDataSet = (value?: BeatSaverPlaylist) => {
-  storePlaylist.currentDataSet(value)
+const playlistDataSet = async (value?: BeatSaverPlaylist) => {
+  await storePlaylist.currentDataSet(value)
   downloadAction.clear()
   createAction.clear()
 }
 
-const fileLoad = async () => {
-  const file = fileBplistRef.value?.inputRef?.files?.[0]
+const fileLoadAction = useAsyncData(
+  'fileLoad',
+  async () => {
+    const file = fileBplistRef.value?.inputRef?.files?.[0]
 
-  if (!file) {
-    playlistDataSet(undefined)
-    return
-  }
+    if (!file) {
+      playlistDataSet(undefined)
+      return
+    }
 
-  const text = await file.text()
-  const { data: dataParsed, error: errParse } = tryCatchSync(() => JSON.parse(text))
+    const text = await file.text()
+    const { data: dataParsed, error: errParse } = tryCatchSync(() => JSON.parse(text))
 
-  if (errParse) {
-    playlistDataSet(undefined)
-    console.log('Pase error', errParse)
-    return
-  }
+    if (errParse) {
+      playlistDataSet(undefined)
+      console.log('Pase error', errParse)
+      return
+    }
 
-  const { data: dataValidated, error: errValidation } = tryCatchSync(() => schemaBeatSavePlaylist.parse(dataParsed))
+    const { data: dataValidated, error: errValidation } = tryCatchSync(() => schemaBeatSavePlaylist.parse(dataParsed))
 
-  if (errValidation) {
-    playlistDataSet(undefined)
-    console.log('Validation error', errValidation, dataParsed)
-    return
-  }
+    if (errValidation) {
+      playlistDataSet(undefined)
+      console.log('Validation error', errValidation, dataParsed)
+      return
+    }
 
-  playlistDataSet(dataValidated)
-}
+    playlistDataSet(dataValidated)
+  },
+  {
+    immediate: false,
+  },
+)
 </script>
 
 <template>
@@ -66,7 +72,8 @@ const fileLoad = async () => {
           type="file"
           accept=".bplist"
           :disabled="downloadAction.status.value === 'pending' || createAction.status.value === 'pending'"
-          @change="fileLoad()"
+          loadingAuto
+          @change="fileLoadAction.execute()"
         />
       </div>
 
@@ -83,17 +90,17 @@ const fileLoad = async () => {
 
           <div class="flex gap-2">
             <UButton
-              :disabled="createAction.status.value === 'pending'"
+              :disabled="fileLoadAction.status.value === 'pending' || createAction.status.value === 'pending'"
               :loading="downloadAction.status.value === 'pending'"
-              :trailingIcon="downloadAction.status.value === 'success' ? 'i-solar:check-square-linear' : undefined"
+              :trailingIcon="downloadAction.status.value === 'success' ? 'i-lucide:check' : undefined"
               @click="downloadAction.execute()"
               >Download songs</UButton
             >
 
             <UButton
-              :disabled="downloadAction.status.value === 'pending'"
+              :disabled="fileLoadAction.status.value === 'pending' || downloadAction.status.value === 'pending'"
               :loading="createAction.status.value === 'pending'"
-              :trailingIcon="createAction.status.value === 'success' ? 'i-solar:check-square-linear' : undefined"
+              :trailingIcon="createAction.status.value === 'success' ? 'i-lucide:check' : undefined"
               @click="createAction.execute()"
               >Create in-game playlist</UButton
             >

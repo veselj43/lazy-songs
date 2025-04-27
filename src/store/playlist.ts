@@ -11,6 +11,11 @@ import { pathJoin } from '~/service/path.service'
 import { useAdbStore } from './adb'
 import { useConfigStore } from './config'
 
+interface SongWithStatus {
+  info: BeatSaverPlaylistSong
+  status: DownloadSongStatus
+}
+
 export const usePlaylistStore = defineStore('playlist', () => {
   const storeAdb = useAdbStore()
   const storeConfig = useConfigStore()
@@ -21,9 +26,9 @@ export const usePlaylistStore = defineStore('playlist', () => {
   }
 
   const currentData = ref<BeatSaverPlaylist>()
-  const currentSongs = ref<{ info: BeatSaverPlaylistSong; status: DownloadSongStatus }[]>()
+  const currentSongs = ref<SongWithStatus[]>()
 
-  const currentDataSet = (value?: BeatSaverPlaylist) => {
+  const currentDataSet = async (value?: BeatSaverPlaylist) => {
     if (!value) {
       currentData.value = undefined
       currentSongs.value = undefined
@@ -32,6 +37,13 @@ export const usePlaylistStore = defineStore('playlist', () => {
 
     currentData.value = value
     currentSongs.value = value.songs.map((song) => ({ info: song, status: 'initial' }))
+
+    for (const song of currentSongs.value) {
+      const path = pathJoin(storeConfig.pathSongs, song.info.hash)
+      const exists = await adb.pathExists(path)
+
+      song.status = exists ? 'done' : 'toDownload'
+    }
   }
 
   const downloadSong = async (song: BeatSaverPlaylistSong, updateState: (state: DownloadSongStatus) => void) => {
@@ -89,15 +101,11 @@ export const usePlaylistStore = defineStore('playlist', () => {
   const download = async () => {
     if (!currentSongs.value) return
 
-    const songs = currentSongs.value
+    for (const song of currentSongs.value) {
+      if (song.status === 'done') continue
 
-    for (const song of songs) {
-      song.status = 'initial'
-    }
-
-    for (const [index, song] of songs.entries()) {
       await downloadSong(song.info, (status) => {
-        currentSongs.value![index].status = status
+        song.status = status
       })
     }
   }

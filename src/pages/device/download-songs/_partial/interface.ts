@@ -1,1 +1,1 @@
-export type DownloadSongStatus = 'initial' | 'download' | 'unzip' | 'copy' | 'done' | 'error'
+export type DownloadSongStatus = 'initial' | 'toDownload' | 'download' | 'unzip' | 'copy' | 'done' | 'error'
