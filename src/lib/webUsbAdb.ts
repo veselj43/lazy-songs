@@ -1,6 +1,7 @@
 import { Adb, AdbDaemonTransport, type AdbSync } from '@yume-chan/adb'
 import AdbWebCredentialStore from '@yume-chan/adb-credential-web'
 import { AdbDaemonWebUsbDevice, AdbDaemonWebUsbDeviceManager } from '@yume-chan/adb-daemon-webusb'
+import { loggerPush } from '~/service/logger.service'
 import { tryCatch } from './error'
 
 export interface AdbDeviceUiItem {
@@ -53,7 +54,7 @@ export class AdbHandler {
 
     if (error) {
       if (error instanceof AdbDaemonWebUsbDevice.DeviceBusyError) {
-        console.warn('The device is already in use by another program. Please close the program and try again.')
+        loggerPush('Error: The device is already in use by another program. Please close the program and try again.')
       }
 
       throw error
@@ -62,7 +63,7 @@ export class AdbHandler {
     const credentialStore: AdbWebCredentialStore = new AdbWebCredentialStore('LazySongs')
 
     const timeout = setTimeout(() => {
-      console.log('Accept authorization request on your device.')
+      loggerPush('Authenticate requested')
       options.onAuthenticateStart?.()
     }, 500)
 
@@ -78,6 +79,7 @@ export class AdbHandler {
     options.onAuthenticateEnd?.(transportErr)
 
     if (transportErr) {
+      loggerPush('Authenticate error:', transportErr.name, transportErr.message)
       throw transportErr
     }
 
@@ -101,20 +103,30 @@ export class AdbSingleton {
     return new AdbSingleton(adb)
   }
 
-  private syncSingleton: AdbSync | undefined
+  private syncSingleton: Promise<AdbSync> | undefined
 
   private constructor(readonly adb: Adb) {}
 
-  async sync() {
+  sync(): Promise<AdbSync> {
     if (!this.syncSingleton) {
-      this.syncSingleton = await this.adb.sync()
+      this.syncSingleton = this.adb.sync()
     }
     return this.syncSingleton
   }
 
-  async pathExists(path: string) {
-    const sync = await this.sync()
-    const { error: statErr } = await tryCatch(sync.stat(path))
-    return !statErr
+  /** Call only with using syntax */
+  async useSync() {
+    const sync = await this.adb.sync()
+
+    return {
+      sync,
+      pathExists: async (path: string) => {
+        const { error: statErr } = await tryCatch(sync.stat(path))
+        return !statErr
+      },
+      [Symbol.asyncDispose]: async () => {
+        await sync.dispose()
+      },
+    }
   }
 }

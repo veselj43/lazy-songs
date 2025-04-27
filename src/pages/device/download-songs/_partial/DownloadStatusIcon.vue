@@ -39,6 +39,7 @@ const downloadSongStateToIcon: Record<DownloadSongStatus, { icon: string; class?
 
 <template>
   <UIcon
+    :key="status"
     :class="downloadSongStateToIcon[status].class"
     :name="downloadSongStateToIcon[status].icon"
     :title="status"

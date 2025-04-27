@@ -46,5 +46,13 @@ export default defineNuxtConfig({
     },
   },
 
-  devtools: { enabled: true },
+  devtools: {
+    enabled: true,
+  },
+
+  runtimeConfig: {
+    public: {
+      showFileExplorer: false,
+    },
+  },
 })

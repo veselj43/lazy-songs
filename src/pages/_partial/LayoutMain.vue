@@ -6,7 +6,7 @@ const tvLayout = tv({
   base: 'h-full px-5 pt-3 pb-8',
   variants: {
     width: {
-      narrow: 'm-auto w-4xl',
+      narrow: 'm-auto w-full xl:max-w-6xl',
       wide: 'w-full',
     },
   },
@@ -25,11 +25,27 @@ const props = withDefaults(
 </script>
 
 <template>
-  <div class="flex h-screen">
-    <AppSidebar class="h-full w-48 overflow-y-auto" />
+  <div class="flex h-screen flex-col">
+    <div class="flex min-h-0 grow">
+      <AppSidebar class="h-full w-48 shrink-0 overflow-y-auto" />
 
-    <div :class="tvLayout({ width: props.width })">
-      <slot />
+      <div :class="tvLayout({ width: props.width })">
+        <slot />
+      </div>
+    </div>
+
+    <div
+      class="flex h-10 shrink-0 grow-0 items-center justify-center border-t border-t-gray-700 bg-neutral-950/10 text-sm text-gray-600"
+    >
+      <p>
+        Made by LazyGod, heavily inspired by
+        <a
+          class="text-success-700 hover:underline"
+          href="https://mbf.bsquest.xyz/"
+          target="_blank"
+          >ModsBeforeFriday</a
+        >
+      </p>
     </div>
   </div>
 </template>

@@ -4,26 +4,25 @@ import { decodeUtf8 } from '@yume-chan/adb'
 import AppHeader from '~/components/AppHeader.vue'
 import { getFileType, type DirEntry, type FileType } from '~/lib/linuxUtils'
 import { streamReadToBytes } from '~/lib/stream'
-import { injectAdbCurrent } from '~/service/adb.provider'
-import { PATH_SEP, pathJoin } from '~/service/path.service'
+import { pathJoin } from '~/service/path.service'
+import { useAdbStore } from '~/store/adb'
 import { useConfigStore } from '~/store/config'
 
-const adb = injectAdbCurrent()
-const sync = await adb.value.sync()
-
 const storeConfig = useConfigStore()
+const storeAdb = useAdbStore()
 
 const entryTypeToIcon: Record<FileType, string> = {
-  dir: 'i-solar:folder-bold-duotone',
-  file: 'i-solar:file-line-duotone',
-  link: 'i-solar:link-square-line-duotone',
+  dir: 'i-lucide:folder',
+  file: 'i-lucide:file',
+  link: 'i-lucide:folder-symlink',
 }
 
 const dirPathCurrent = ref(storeConfig.pathSongs)
 
 const dirItems = await useAsyncData(
   async () => {
-    const result = await sync.readdir(dirPathCurrent.value)
+    await using syncUse = await storeAdb.deviceAdbGetOrThrow().useSync()
+    const result = await syncUse.sync.readdir(dirPathCurrent.value)
     return result
   },
   {
@@ -63,15 +62,7 @@ const dirEntrySelect = (dirEntry: DirEntry) => {
     return
   }
 
-  const pathSegments = dirPathCurrent.value.split(PATH_SEP).filter((segment) => !!segment)
-
-  if (dirEntry.name === '..') {
-    pathSegments.pop()
-  } else {
-    pathSegments.push(dirEntry.name)
-  }
-
-  const pathNew = pathJoin('/', ...pathSegments)
+  const pathNew = pathJoin(dirPathCurrent.value, dirEntry.name)
   dirPathCurrent.value = pathNew
 }
 
@@ -79,9 +70,9 @@ const filePreview = shallowRef<{ name: string; content: string }>()
 const filePreviewOpen = ref(false)
 
 const fileRead = async (dirEntry: DirEntry) => {
+  await using syncUse = await storeAdb.deviceAdbGetOrThrow().useSync()
   const pathFull = pathJoin(dirPathCurrent.value, dirEntry.name)
-
-  const reader = sync.read(pathFull)
+  const reader = syncUse.sync.read(pathFull)
   const bytes = await streamReadToBytes(reader)
   const text = decodeUtf8(bytes)
 
@@ -102,11 +93,7 @@ const fileRead = async (dirEntry: DirEntry) => {
         <div>{{ dirPathCurrent }}</div>
       </template>
       <template #right>
-        <UButton
-          class="cursor-pointer"
-          @click="dirPathCurrent = '/'"
-          >Go to root</UButton
-        >
+        <UButton @click="dirPathCurrent = '/'">Go to root</UButton>
       </template>
     </AppHeader>
 
@@ -126,7 +113,7 @@ const fileRead = async (dirEntry: DirEntry) => {
           <tr
             v-for="entry in dirItemsUi"
             :key="entry.name"
-            class="hover:bg-neutral-50/10"
+            class="hover:bg-neutral-600/25"
           >
             <td
               class="w-8 cursor-pointer px-2 py-1 text-center align-middle"
@@ -152,10 +139,10 @@ const fileRead = async (dirEntry: DirEntry) => {
               {{ entry.size }}
             </td>
             <td>
-              <div class="flex items-center">
+              <div class="flex items-center justify-end">
                 <UButton
                   v-if="entry.type === 'file'"
-                  class="cursor-pointer"
+                  variant="ghost"
                   size="sm"
                   @click="fileRead(entry)"
                   >Read</UButton

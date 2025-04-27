@@ -1,18 +1,18 @@
 import { tryCatch } from '~/lib/error'
 import { AdbHandler, AdbSingleton, type AdbDeviceUiItem } from '~/lib/webUsbAdb'
+import { useConfigStore } from './config'
 
 export const useAdbStore = defineStore('adb', () => {
-  const handler = shallowRef(AdbHandler.init())
+  const storeConfig = useConfigStore()
 
+  const handler = shallowRef(AdbHandler.init())
   const device = shallowRef<AdbDeviceUiItem>()
   const deviceAdb = shallowRef<AdbSingleton>()
-
   const deviceConnectState = ref<
-    'initial' | 'pending' | 'authorizationWait' | 'authorizationError' | 'authorizationSuccess' | 'error' | 'open'
+    'initial' | 'pending' | 'authenticationWait' | 'authenticationError' | 'authenticationSuccess' | 'error' | 'open'
   >('initial')
-
   const deviceIsConnecting = computed(() => {
-    return ['pending', 'authorizationWait', 'authorizationSuccess'].includes(deviceConnectState.value)
+    return ['pending', 'authenticationWait', 'authenticationSuccess'].includes(deviceConnectState.value)
   })
 
   const deviceConnect = async () => {
@@ -34,10 +34,10 @@ export const useAdbStore = defineStore('adb', () => {
       const { data: adb, error } = await tryCatch(
         adbHandler.deviceConnect(deviceUi.device, {
           onAuthenticateStart: () => {
-            deviceConnectState.value = 'authorizationWait'
+            deviceConnectState.value = 'authenticationWait'
           },
           onAuthenticateEnd(error) {
-            deviceConnectState.value = error ? 'authorizationError' : 'authorizationSuccess'
+            deviceConnectState.value = error ? 'authenticationError' : 'authenticationSuccess'
           },
         }),
       )
@@ -54,23 +54,38 @@ export const useAdbStore = defineStore('adb', () => {
 
   const deviceSelect = async (val?: AdbDeviceUiItem) => {
     const adb = deviceAdb.value?.adb
-    if (adb && adb.serial !== val?.serial) {
-      adb.close()
+    if (adb && adb.serial !== val?.serial && deviceConnectState.value !== 'initial') {
+      await adb.close()
+      deviceAdb.value = undefined
     }
 
+    deviceConnectState.value = 'initial'
     device.value = val
 
     if (val) {
+      storeConfig.resetForDevice(val.device)
       await deviceConnect()
     }
+  }
+
+  const deviceAdbGetOrThrow = () => {
+    if (!deviceAdb.value) {
+      throw new Error('ADB not found')
+    }
+    return deviceAdb.value
   }
 
   return {
     device,
     deviceAdb,
+    deviceAdbGetOrThrow,
     deviceConnectState,
     deviceIsConnecting,
     deviceSelect,
     handler,
   }
 })
+
+if (import.meta.hot) {
+  import.meta.hot.accept(acceptHMRUpdate(useAdbStore, import.meta.hot))
+}

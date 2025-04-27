@@ -1,20 +1,17 @@
 <script setup lang="ts">
 import AppHeader from '~/components/AppHeader.vue'
+import { useAsyncAction } from '~/lib/asyncAction'
 import { tryCatchSync } from '~/lib/error'
 import { schemaBeatSavePlaylist, type BeatSaverPlaylist } from '~/service/beatSaver.interface'
+import { loggerPush } from '~/service/logger.service'
 import { usePlaylistStore } from '~/store/playlist'
 import SongStatusIcon from './DownloadStatusIcon.vue'
 
 const storePlaylist = usePlaylistStore()
 const fileBplistRef = ref<{ inputRef: HTMLInputElement }>()
 
-const downloadAction = useAsyncData('playlistDownload', () => storePlaylist.download(), {
-  immediate: false,
-})
-
-const createAction = useAsyncData('playlistCreate', () => storePlaylist.create(), {
-  immediate: false,
-})
+const downloadAction = useAsyncAction(() => storePlaylist.download())
+const createAction = useAsyncAction(() => storePlaylist.create())
 
 const playlistDataSet = async (value?: BeatSaverPlaylist) => {
   await storePlaylist.currentDataSet(value)
@@ -22,39 +19,37 @@ const playlistDataSet = async (value?: BeatSaverPlaylist) => {
   createAction.clear()
 }
 
-const fileLoadAction = useAsyncData(
-  'fileLoad',
-  async () => {
-    const file = fileBplistRef.value?.inputRef?.files?.[0]
+// reset state on load
+playlistDataSet()
 
-    if (!file) {
-      playlistDataSet(undefined)
-      return
-    }
+const fileLoadAction = useAsyncAction(async () => {
+  const file = fileBplistRef.value?.inputRef?.files?.[0]
 
-    const text = await file.text()
-    const { data: dataParsed, error: errParse } = tryCatchSync(() => JSON.parse(text))
+  if (!file) {
+    playlistDataSet(undefined)
+    return
+  }
 
-    if (errParse) {
-      playlistDataSet(undefined)
-      console.log('Pase error', errParse)
-      return
-    }
+  const text = await file.text()
+  const { data: dataParsed, error: errParse } = tryCatchSync(() => JSON.parse(text))
 
-    const { data: dataValidated, error: errValidation } = tryCatchSync(() => schemaBeatSavePlaylist.parse(dataParsed))
+  if (errParse) {
+    playlistDataSet(undefined)
+    loggerPush('Pase error', errParse.name, errParse.message)
+    return
+  }
 
-    if (errValidation) {
-      playlistDataSet(undefined)
-      console.log('Validation error', errValidation, dataParsed)
-      return
-    }
+  const { data: dataValidated, error: errValidation } = tryCatchSync(() => schemaBeatSavePlaylist.parse(dataParsed))
 
-    playlistDataSet(dataValidated)
-  },
-  {
-    immediate: false,
-  },
-)
+  if (errValidation) {
+    playlistDataSet(undefined)
+    console.warn('Validation error', errValidation, dataParsed)
+    loggerPush('Validation error', errValidation.name, errValidation.message)
+    return
+  }
+
+  playlistDataSet(dataValidated)
+})
 </script>
 
 <template>
@@ -128,8 +123,6 @@ const fileLoadAction = useAsyncData(
           </table>
         </div>
       </div>
-
-      <!-- <pre class="m-2">{{ fileBplistContent }}</pre> -->
     </div>
   </div>
 </template>

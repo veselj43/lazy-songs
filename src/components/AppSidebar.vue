@@ -2,22 +2,48 @@
 import { UNavigationMenu } from '#components'
 import type { NavigationMenuItem } from '@nuxt/ui'
 
+const config = useRuntimeConfig()
+
 const items = ref<NavigationMenuItem[][]>([
   [
     {
       label: 'Download songs',
-      icon: 'i-solar:download-square-linear',
+      icon: 'i-lucide:file-down',
       to: '/device/download-songs',
     },
     {
       label: 'Song manager',
-      icon: 'i-solar:music-library-linear',
+      icon: 'i-lucide:file-music',
       to: '/device/song-manager',
     },
     {
-      label: 'File explorer',
-      icon: 'i-solar:file-linear',
-      to: '/device/file-explorer',
+      label: 'Playlist manager',
+      icon: 'i-lucide:file-stack',
+      to: '/device/playlist-manager',
+    },
+
+    ...(config.public.showFileExplorer
+      ? [
+          {
+            label: 'File explorer',
+            icon: 'i-lucide:file-question',
+            to: '/device/file-explorer',
+          },
+        ]
+      : []),
+  ],
+  [
+    {
+      label: 'Settings',
+      icon: 'i-lucide:cog',
+      to: '/device/settings',
+    },
+  ],
+  [
+    {
+      label: 'Select device',
+      icon: 'i-lucide:usb',
+      to: '/',
     },
   ],
 ])
