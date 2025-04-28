@@ -52,6 +52,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
+      hrefGit: 'https://github.com/veselj43/lazy-songs',
       showFileExplorer: false,
     },
   },

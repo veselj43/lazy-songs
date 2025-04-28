@@ -15,6 +15,18 @@ export default withNuxt([
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       'vue/attribute-hyphenation': 'off',
+      'vue/html-self-closing': [
+        'warn',
+        {
+          html: {
+            void: 'always',
+            normal: 'always',
+            component: 'always',
+          },
+          svg: 'always',
+          math: 'always',
+        },
+      ],
       'vue/no-multiple-template-root': 'off',
       'vue/v-on-event-hyphenation': 'off',
     },

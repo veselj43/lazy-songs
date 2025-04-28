@@ -1,23 +1,19 @@
-# Nuxt Minimal Starter
+Lazy Songs is SPA for managing BeatSaber custom songs (maps) and playlists.
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Inspired by [ModsBeforeFriday](https://github.com/Lauriethefish/ModsBeforeFriday) with WebUSB and ADB approach.
 
-## Setup
+# Core technology
+
+- [Nuxt](https://nuxt.com/) (no SSR)
+- [Nuxt UI](https://ui.nuxt.com/)
+- WebUSB API with ADB - [Tango](https://github.com/yume-chan/ya-webadb)
+
+# Setup
 
 Make sure to install dependencies:
 
 ```bash
-# npm
-npm install
-
-# pnpm
 pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
 ```
 
 ## Development Server
@@ -25,51 +21,13 @@ bun install
 Start the development server on `http://localhost:3000`:
 
 ```bash
-# npm
-npm run dev
-
-# pnpm
 pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
 
 ## Production
 
-Build the application for production:
+Build the application for production (SPA mode):
 
 ```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
+pnpm generate
 ```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.

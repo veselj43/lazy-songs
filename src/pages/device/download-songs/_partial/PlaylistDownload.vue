@@ -56,6 +56,17 @@ const fileLoadAction = useAsyncAction(async () => {
   <div>
     <AppHeader>Download playlist</AppHeader>
 
+    <p class="mb-4">
+      Download any playlist from
+      <a
+        class="text-success-500 hover:underline"
+        href="https://beatsaver.com/"
+        target="_blank"
+        >BeatSaver</a
+      >
+      (<code class="text-sm">.bplist</code> file), select the file below and download all songs to you Quest.
+    </p>
+
     <div class="flex flex-col gap-2">
       <div>
         <UInput

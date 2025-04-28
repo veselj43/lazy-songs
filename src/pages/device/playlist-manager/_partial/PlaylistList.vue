@@ -45,6 +45,14 @@ const columns: TableColumn<PlaylistWithInfo>[] = [
       return playlistInfo.playlistAuthor
     },
   },
+  {
+    id: 'songCount',
+    header: 'Songs',
+    cell: ({ row }) => {
+      const playlistInfo = row.original.info
+      return playlistInfo.songs.length
+    },
+  },
 ]
 
 const playlistRemoveAction = useAsyncAction(async () => {

@@ -38,7 +38,18 @@ const props = withDefaults(
       class="flex h-10 shrink-0 grow-0 items-center justify-center border-t border-t-gray-700 bg-neutral-950/10 text-sm text-gray-600"
     >
       <p>
-        Made by LazyGod, heavily inspired by
+        <a
+          class="text-success-700 hover:underline"
+          :href="$config.public.hrefGit"
+          target="_blank"
+          >GitHub</a
+        >
+      </p>
+
+      <span class="px-2 text-gray-800">|</span>
+
+      <p>
+        Made by <span class="text-gray-500">LazyGod</span>, inspired by
         <a
           class="text-success-700 hover:underline"
           href="https://mbf.bsquest.xyz/"
