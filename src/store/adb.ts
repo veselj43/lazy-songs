@@ -22,13 +22,13 @@ export const useAdbStore = defineStore('adb', () => {
       return
     }
 
-    deviceConnectState.value = 'pending'
-
     const deviceUi = device.value
     if (!deviceUi) {
       deviceConnectState.value = 'initial'
       return
     }
+
+    deviceConnectState.value = 'pending'
 
     if (!deviceAdb.value) {
       const { data: adb, error } = await tryCatch(

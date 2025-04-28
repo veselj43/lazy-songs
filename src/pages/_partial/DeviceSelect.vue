@@ -34,12 +34,13 @@ onBeforeMount(() => {
 
 <template>
   <div class="w-full">
-    <div>
+    <div v-if="storeAdb.deviceConnectState !== 'initial'">
       <UAlert
         v-if="storeAdb.deviceConnectState === 'authenticationError'"
         variant="soft"
         color="error"
         title="Device denied authorization request"
+        description="Reload page and try again. Sometimes reconnecting USB cable can also help."
       />
 
       <UAlert
@@ -47,11 +48,8 @@ onBeforeMount(() => {
         variant="soft"
         color="error"
         title="Something went wrong"
+        description="Reload page and try again. Sometimes reconnecting USB cable can also help."
       />
-    </div>
-
-    <div v-if="storeAdb.deviceIsConnecting">
-      <!-- TODO add more states -->
 
       <UAlert
         v-if="storeAdb.deviceConnectState === 'authenticationWait'"
@@ -61,7 +59,7 @@ onBeforeMount(() => {
       />
 
       <UAlert
-        v-else
+        v-else-if="storeAdb.deviceIsConnecting"
         variant="soft"
         color="info"
         title="Connecting..."
