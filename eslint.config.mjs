@@ -16,6 +16,7 @@ export default withNuxt([
       '@typescript-eslint/no-explicit-any': 'off',
       'vue/attribute-hyphenation': 'off',
       'vue/no-multiple-template-root': 'off',
+      'vue/v-on-event-hyphenation': 'off',
     },
   },
   {

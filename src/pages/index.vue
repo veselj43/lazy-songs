@@ -22,9 +22,13 @@ const deviceSelect = async (_device?: AdbDeviceUiItem) => {
   await storeAdb.deviceSelect(device)
 
   if (storeAdb.deviceAdb) {
-    router.push('/device/song-manager')
+    router.push('/device/download-songs')
   }
 }
+
+onBeforeMount(() => {
+  storeAdb.deviceSelect()
+})
 </script>
 
 <template>
@@ -45,7 +49,7 @@ const deviceSelect = async (_device?: AdbDeviceUiItem) => {
         <!-- TODO add more states -->
 
         <UAlert
-          v-if="storeAdb.deviceConnectState === 'authorizationWait'"
+          v-if="storeAdb.deviceConnectState === 'authenticationWait'"
           variant="soft"
           color="warning"
           title="Check your device for authorization request"
@@ -70,7 +74,7 @@ const deviceSelect = async (_device?: AdbDeviceUiItem) => {
             <tr
               v-for="usbDevice in deviceList"
               :key="usbDevice.name"
-              class="hover:bg-neutral-400/10"
+              class="hover:bg-neutral-600/25"
             >
               <td
                 class="px-4 py-2"
@@ -85,7 +89,6 @@ const deviceSelect = async (_device?: AdbDeviceUiItem) => {
 
               <td class="px-2 py-2 text-right">
                 <UButton
-                  class="cursor-pointer"
                   variant="ghost"
                   color="primary"
                   size="xs"
@@ -99,7 +102,6 @@ const deviceSelect = async (_device?: AdbDeviceUiItem) => {
 
         <div class="mt-2 px-4">
           <UButton
-            class="cursor-pointer"
             variant="solid"
             color="primary"
             @click="deviceSelect()"
@@ -120,7 +122,7 @@ const deviceSelect = async (_device?: AdbDeviceUiItem) => {
 
       <div>
         <UAlert
-          v-if="storeAdb.deviceConnectState === 'authorizationError'"
+          v-if="storeAdb.deviceConnectState === 'authenticationError'"
           variant="soft"
           color="error"
           title="Device denied authorization request"

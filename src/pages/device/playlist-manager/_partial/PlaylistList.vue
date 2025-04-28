@@ -5,17 +5,17 @@ import type { Table } from '@tanstack/vue-table'
 import AppHeader from '~/components/AppHeader.vue'
 import AppModalConfirm from '~/components/AppModalConfirm.vue'
 import { useAsyncAction } from '~/lib/asyncAction'
-import { useSongManagerStore } from '~/store/songManager'
-import type { SongWithInfo } from './interface'
+import { usePlaylistManagerStore } from '~/store/playlistManager'
+import type { PlaylistWithInfo } from './interface'
 
-const storeSongManager = useSongManagerStore()
+const storePlaylistManager = usePlaylistManagerStore()
 
-const table = useTemplateRef<{ tableApi: Table<SongWithInfo> }>('table')
+const table = useTemplateRef<{ tableApi: Table<PlaylistWithInfo> }>('table')
 const modalConfirm = useTemplateRef('modalConfirm')
 
-const songsDirFilesWithInfo = useAsyncAction((options: { force?: boolean }) => storeSongManager.songsGetAll(options))
+const playlistDirFilesWithInfo = useAsyncAction(() => storePlaylistManager.playlistsGetAll())
 
-const columns: TableColumn<SongWithInfo>[] = [
+const columns: TableColumn<PlaylistWithInfo>[] = [
   {
     id: 'select',
     header: ({ table }) =>
@@ -34,29 +34,20 @@ const columns: TableColumn<SongWithInfo>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: 'songTitle',
+    accessorKey: 'playlistTitle',
     header: 'Song title',
   },
   {
     accessorKey: 'songAuthor',
-    header: 'Map author',
+    header: 'Playlist author',
     cell: ({ row }) => {
-      const songInfo = row.original.info
-      return songInfo._levelAuthorName
+      const playlistInfo = row.original.info
+      return playlistInfo.playlistAuthor
     },
   },
 ]
 
-const inputFilter = computed(() => {
-  const filterValue = table.value?.tableApi?.getColumn('songTitle')?.getFilterValue()
-  return typeof filterValue === 'string' ? filterValue : ''
-})
-
-const inputFilterUpdate = (val: string) => {
-  table.value?.tableApi?.getColumn('songTitle')?.setFilterValue(val)
-}
-
-const songRemoveAction = useAsyncAction(async () => {
+const playlistRemoveAction = useAsyncAction(async () => {
   const confirmApi = modalConfirm.value
   const tableApi = table.value?.tableApi
 
@@ -65,18 +56,27 @@ const songRemoveAction = useAsyncAction(async () => {
   const isConfirmed = await confirmApi.open()
   if (!isConfirmed) return
 
-  const tableRows = tableApi.getSelectedRowModel().rows
-  if (!tableRows) return
+  const playlistRows = tableApi.getSelectedRowModel().rows
+  if (!playlistRows) return
 
-  const songDirs = tableRows.map((row) => row.original.dirEntry)
-  await storeSongManager.songsRemove(songDirs)
+  const playlistFiles = playlistRows.map((row) => row.original.dirEntry)
+  await storePlaylistManager.playlistsRemove(playlistFiles)
 
-  await songsDirFilesWithInfo.execute({ force: false })
+  await playlistDirFilesWithInfo.execute()
   tableApi.resetRowSelection()
 })
 
+const inputFilter = computed(() => {
+  const filterValue = table.value?.tableApi?.getColumn('playlistTitle')?.getFilterValue()
+  return typeof filterValue === 'string' ? filterValue : ''
+})
+
+const inputFilterUpdate = (val: string) => {
+  table.value?.tableApi?.getColumn('playlistTitle')?.setFilterValue(val)
+}
+
 onBeforeMount(() => {
-  songsDirFilesWithInfo.execute({ force: false })
+  playlistDirFilesWithInfo.execute()
 })
 </script>
 
@@ -84,11 +84,11 @@ onBeforeMount(() => {
   <div class="flex max-h-full flex-col gap-2">
     <AppHeader>
       <template #default>
-        Songs
+        Playlists
         <span
-          v-if="songsDirFilesWithInfo.data.value"
+          v-if="playlistDirFilesWithInfo.data.value"
           class="text-base"
-          >({{ songsDirFilesWithInfo.data.value.length }})</span
+          >({{ playlistDirFilesWithInfo.data.value.length }})</span
         >
       </template>
 
@@ -97,7 +97,7 @@ onBeforeMount(() => {
           class="text-base"
           icon="i-lucide:refresh-ccw"
           variant="ghost"
-          @click="songsDirFilesWithInfo.execute({ force: true })"
+          @click="playlistDirFilesWithInfo.execute()"
         />
       </template>
     </AppHeader>
@@ -105,7 +105,7 @@ onBeforeMount(() => {
     <div class="flex items-center justify-between gap-2">
       <UInput
         class="max-w-sm min-w-[25ch]"
-        placeholder="Filter songs..."
+        placeholder="Filter playlists..."
         :modelValue="inputFilter"
         @update:modelValue="inputFilterUpdate"
       >
@@ -129,8 +129,8 @@ onBeforeMount(() => {
           variant="subtle"
           color="error"
           icon="i-lucide:x"
-          :loading="songRemoveAction.status.value === 'pending'"
-          @click="songRemoveAction.execute()"
+          :loading="playlistRemoveAction.status.value === 'pending'"
+          @click="playlistRemoveAction.execute()"
           >Remove selected</UButton
         >
       </div>
@@ -138,15 +138,15 @@ onBeforeMount(() => {
 
     <UTable
       ref="table"
-      :data="songsDirFilesWithInfo.data.value ?? undefined"
+      :data="playlistDirFilesWithInfo.data.value ?? undefined"
       :columns="columns"
       sticky
-      :loading="songsDirFilesWithInfo.status.value === 'pending'"
+      :loading="playlistDirFilesWithInfo.status.value === 'pending'"
     />
 
     <AppModalConfirm
       ref="modalConfirm"
-      title="Do you want to remove selected songs?"
+      title="Do you want to remove selected playlists?"
     />
   </div>
 </template>

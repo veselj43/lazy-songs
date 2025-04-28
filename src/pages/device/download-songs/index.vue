@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import AdbProvider from '~/components/AdbProvider.vue'
 import { middlewareAdbDeviceCheck } from '~/pages/_partial/adb.middleware'
-import LayoutMain from '../../_partial/LayoutMain.vue'
-import AdbPlayground from './_partial/AdbPlayground.vue'
+import LayoutMain from '~/pages/_partial/LayoutMain.vue'
+import PlaylistDownload from './_partial/PlaylistDownload.vue'
 
 definePageMeta({
   middleware: [middlewareAdbDeviceCheck],
@@ -11,8 +10,6 @@ definePageMeta({
 
 <template>
   <LayoutMain>
-    <AdbProvider>
-      <AdbPlayground />
-    </AdbProvider>
+    <PlaylistDownload />
   </LayoutMain>
 </template>
