@@ -118,12 +118,20 @@ export class AdbSingleton {
   async useSync() {
     const sync = await this.adb.sync()
 
+    const pathStat = async (path: string) => {
+      const { data: statData } = await tryCatch(sync.lstat(path))
+      return statData
+    }
+
+    const pathExists = async (path: string) => {
+      const stat = await pathStat(path)
+      return !!stat
+    }
+
     return {
       sync,
-      pathExists: async (path: string) => {
-        const { error: statErr } = await tryCatch(sync.stat(path))
-        return !statErr
-      },
+      pathExists,
+      pathStat,
       [Symbol.asyncDispose]: async () => {
         await sync.dispose()
       },

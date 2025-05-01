@@ -4,10 +4,10 @@ import { useAsyncAction } from '~/lib/asyncAction'
 import { tryCatchSync } from '~/lib/error'
 import { schemaBeatSavePlaylist, type BeatSaverPlaylist } from '~/service/beatSaver.interface'
 import { loggerPush } from '~/service/logger.service'
-import { usePlaylistStore } from '~/store/playlist'
+import { usePlaylistDownloadStore } from '~/store/playlistDownload'
 import SongStatusIcon from './DownloadStatusIcon.vue'
 
-const storePlaylist = usePlaylistStore()
+const storePlaylist = usePlaylistDownloadStore()
 const fileBplistRef = ref<{ inputRef: HTMLInputElement }>()
 
 const downloadAction = useAsyncAction(() => storePlaylist.download())

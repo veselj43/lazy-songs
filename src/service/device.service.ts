@@ -2,6 +2,7 @@ import type { AdbDaemonWebUsbDevice } from '@yume-chan/adb-daemon-webusb'
 
 export interface DevicePaths {
   pathPlaylists: string
+  pathSongDataCache: string
   pathSongs: string
 }
 
@@ -11,16 +12,18 @@ export const devicePathsResolve = (device: AdbDaemonWebUsbDevice): DevicePaths =
   if (vendorId === 10291 && productId === 390) {
     // Quest 2
     return {
-      pathPlaylists: '/storage/self/primary/ModData/com.beatgames.beatsaber/Mods/PlaylistManager/Playlists',
-      pathSongs: '/storage/self/primary/ModData/com.beatgames.beatsaber/Mods/SongLoader/CustomLevels',
+      pathPlaylists: '/sdcard/ModData/com.beatgames.beatsaber/Mods/PlaylistManager/Playlists',
+      pathSongDataCache: '/sdcard/ModData/com.beatgames.beatsaber/Mods/SongCore/CachedSongData.json',
+      pathSongs: '/sdcard/ModData/com.beatgames.beatsaber/Mods/SongLoader/CustomLevels',
     }
   }
 
   if (vendorId === 10291) {
     // other Quests ? - TODO check
     return {
-      pathPlaylists: '/storage/self/primary/ModData/com.beatgames.beatsaber/Mods/PlaylistManager/Playlists',
-      pathSongs: '/storage/self/primary/ModData/com.beatgames.beatsaber/Mods/SongLoader/CustomLevels',
+      pathPlaylists: '/sdcard/ModData/com.beatgames.beatsaber/Mods/PlaylistManager/Playlists',
+      pathSongDataCache: '/sdcard/ModData/com.beatgames.beatsaber/Mods/SongCore/CachedSongData.json',
+      pathSongs: '/sdcard/ModData/com.beatgames.beatsaber/Mods/SongLoader/CustomLevels',
     }
   }
 
@@ -28,13 +31,15 @@ export const devicePathsResolve = (device: AdbDaemonWebUsbDevice): DevicePaths =
     // Android device used for testing
     return {
       pathPlaylists: '/storage/self/primary/_test/playlists',
+      pathSongDataCache: '/storage/self/primary/_test/CachedSongData.json',
       pathSongs: '/storage/self/primary/_test/songs',
     }
   }
 
   // yolo - TODO handling
   return {
-    pathPlaylists: '/storage/self/primary/ModData/com.beatgames.beatsaber/Mods/PlaylistManager/Playlists',
-    pathSongs: '/storage/self/primary/ModData/com.beatgames.beatsaber/Mods/SongLoader/CustomLevels',
+    pathPlaylists: '/sdcard/ModData/com.beatgames.beatsaber/Mods/PlaylistManager/Playlists',
+    pathSongDataCache: '/sdcard/ModData/com.beatgames.beatsaber/Mods/SongCore/CachedSongData.json',
+    pathSongs: '/sdcard/ModData/com.beatgames.beatsaber/Mods/SongLoader/CustomLevels',
   }
 }

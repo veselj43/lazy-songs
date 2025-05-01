@@ -11,6 +11,7 @@ const storeAdb = useAdbStore()
 
 const formSchema = z.object({
   pathPlaylists: z.string(),
+  pathSongDataCache: z.string(),
   pathSongs: z.string(),
 })
 
@@ -18,12 +19,14 @@ type FormSchema = z.output<typeof formSchema>
 
 const formState = reactive<Partial<FormSchema>>({
   pathPlaylists: storeConfig.pathPlaylists,
+  pathSongDataCache: storeConfig.pathSongDataCache,
   pathSongs: storeConfig.pathSongs,
 })
 
 const formSubmit = useAsyncAction(async (event: FormSubmitEvent<FormSchema>) => {
   storeConfig.pathsSet({
     pathPlaylists: event.data.pathPlaylists,
+    pathSongDataCache: event.data.pathSongDataCache,
     pathSongs: event.data.pathSongs,
   })
 })
@@ -63,6 +66,16 @@ const resetToDefaults = () => {
         >
           <UInput
             v-model="formState.pathPlaylists"
+            class="w-full"
+          />
+        </UFormField>
+
+        <UFormField
+          label="Path to CachedSongData.json (SongLoader mod)"
+          name="pathSongDataCache"
+        >
+          <UInput
+            v-model="formState.pathSongDataCache"
             class="w-full"
           />
         </UFormField>

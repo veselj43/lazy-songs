@@ -11,15 +11,17 @@ import { loggerPush } from '~/service/logger.service'
 import { pathJoin } from '~/service/path.service'
 import { useAdbStore } from './adb'
 import { useConfigStore } from './config'
+import { useModSongLoaderStore } from './modSongLoader'
 
 interface SongWithStatus {
   info: BeatSaverPlaylistSong
   status: DownloadSongStatus
 }
 
-export const usePlaylistStore = defineStore('playlist', () => {
+export const usePlaylistDownloadStore = defineStore('playlistDownload', () => {
   const storeAdb = useAdbStore()
   const storeConfig = useConfigStore()
+  const storeModSongLoader = useModSongLoaderStore()
 
   const currentData = ref<BeatSaverPlaylist>()
   const currentSongs = ref<SongWithStatus[]>()
@@ -34,10 +36,8 @@ export const usePlaylistStore = defineStore('playlist', () => {
     currentData.value = value
     currentSongs.value = value.songs.map((song) => ({ info: song, status: 'initial' }))
 
-    await using syncUse = await storeAdb.deviceAdbGetOrThrow().useSync()
     for (const song of currentSongs.value) {
-      const path = pathJoin(storeConfig.pathSongs, song.info.hash)
-      const exists = await syncUse.pathExists(path)
+      const exists = await storeModSongLoader.checkSongExists(song.info.hash)
 
       song.status = exists ? 'done' : 'toDownload'
     }
@@ -136,5 +136,5 @@ export const usePlaylistStore = defineStore('playlist', () => {
 })
 
 if (import.meta.hot) {
-  import.meta.hot.accept(acceptHMRUpdate(usePlaylistStore, import.meta.hot))
+  import.meta.hot.accept(acceptHMRUpdate(usePlaylistDownloadStore, import.meta.hot))
 }

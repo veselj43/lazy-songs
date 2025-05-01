@@ -3,10 +3,12 @@ import { devicePathsResolve, type DevicePaths } from '~/service/device.service'
 
 export const useConfigStore = defineStore('config', () => {
   const pathPlaylists = ref('/storage/self/primary/')
+  const pathSongDataCache = ref('/storage/self/primary/')
   const pathSongs = ref('/storage/self/primary/')
 
   const pathsSet = (devicePaths: DevicePaths) => {
     pathPlaylists.value = devicePaths.pathPlaylists
+    pathSongDataCache.value = devicePaths.pathSongDataCache
     pathSongs.value = devicePaths.pathSongs
   }
 
@@ -17,6 +19,7 @@ export const useConfigStore = defineStore('config', () => {
 
   return {
     pathPlaylists,
+    pathSongDataCache,
     pathSongs,
     pathsSet,
     resetForDevice,

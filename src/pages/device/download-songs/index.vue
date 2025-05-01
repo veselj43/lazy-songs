@@ -13,7 +13,7 @@ useHead({
 </script>
 
 <template>
-  <LayoutMain>
+  <LayoutMain :scrollable="true">
     <PlaylistDownload />
   </LayoutMain>
 </template>
