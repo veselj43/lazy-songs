@@ -1,10 +1,6 @@
-import { streamFromString, streamPipeUnzip } from '~/lib/stream'
+import { streamPipeUnzip } from '~/lib/stream'
 import type { DownloadSongStatus } from '~/pages/device/download-songs/_partial/interface'
-import {
-  BEAT_SABER_PLAYLIST_EXT,
-  beatSaberPlaylistFromBeatSaverPlaylist,
-  sanitizeFileName,
-} from '~/service/beatSaber.service'
+import { beatSaberPlaylistFromBeatSaverPlaylist } from '~/service/beatSaber.service'
 import type { BeatSaverPlaylist, BeatSaverPlaylistSong } from '~/service/beatSaver.interface'
 import { beatSaverGetSongStream } from '~/service/beatSaver.service'
 import { loggerPush } from '~/service/logger.service'
@@ -12,6 +8,7 @@ import { pathJoin } from '~/service/path.service'
 import { useAdbStore } from './adb'
 import { useConfigStore } from './config'
 import { useModSongLoaderStore } from './modSongLoader'
+import { usePlaylistManagerStore } from './playlistManager'
 
 interface SongWithStatus {
   info: BeatSaverPlaylistSong
@@ -22,6 +19,7 @@ export const usePlaylistDownloadStore = defineStore('playlistDownload', () => {
   const storeAdb = useAdbStore()
   const storeConfig = useConfigStore()
   const storeModSongLoader = useModSongLoaderStore()
+  const storePlaylistManager = usePlaylistManagerStore()
 
   const currentData = ref<BeatSaverPlaylist>()
   const currentSongs = ref<SongWithStatus[]>()
@@ -109,21 +107,17 @@ export const usePlaylistDownloadStore = defineStore('playlistDownload', () => {
     }
   }
 
+  const exists = () => {
+    if (!currentData.value) return
+
+    return storePlaylistManager.playlistExistsByTitle(currentData.value.playlistTitle)
+  }
+
   const create = async () => {
     if (!currentData.value) return
 
     const beatSaberPlaylist = beatSaberPlaylistFromBeatSaverPlaylist(currentData.value)
-    const filePath = pathJoin(
-      storeConfig.pathPlaylists,
-      `${sanitizeFileName(beatSaberPlaylist.playlistTitle)}.${BEAT_SABER_PLAYLIST_EXT}`,
-    )
-
-    await using syncUse = await storeAdb.deviceAdbGetOrThrow().useSync()
-    const sync = syncUse.sync
-    await sync.write({
-      filename: filePath,
-      file: streamFromString(JSON.stringify(beatSaberPlaylist, undefined, 2)),
-    })
+    await storePlaylistManager.playlistSave(beatSaberPlaylist)
   }
 
   return {
@@ -131,6 +125,7 @@ export const usePlaylistDownloadStore = defineStore('playlistDownload', () => {
     currentData,
     currentSongs,
     download,
+    exists,
     create,
   }
 })

@@ -1,15 +1,17 @@
 import { decodeUtf8, LinuxFileType, type AdbSyncEntry } from '@yume-chan/adb'
 import { streamReadToBytes } from '~/lib/stream'
-import type { SongWithInfo } from '~/pages/device/song-manager/_partial/interface'
 import type { BeatSaberSongInfo } from '~/service/beatSaber.interface'
 import { loggerPush } from '~/service/logger.service'
 import { pathJoin } from '~/service/path.service'
+import type { SongWithInfo } from '~/service/uiBeatSaber.interface'
 import { useAdbStore } from './adb'
 import { useConfigStore } from './config'
+import { useModSongLoaderStore } from './modSongLoader'
 
 export const useSongManagerStore = defineStore('songManager', () => {
   const storeAdb = useAdbStore()
   const storeConfig = useConfigStore()
+  const storeModSongLoader = useModSongLoaderStore()
 
   const songs = shallowRef<SongWithInfo[]>()
   const songsUpdated = shallowRef<number>()
@@ -28,13 +30,22 @@ export const useSongManagerStore = defineStore('songManager', () => {
     for (const songEntry of songsDirEntries) {
       if (songEntry.type !== LinuxFileType.Directory) continue
 
-      const songInfoPath = pathJoin(storeConfig.pathSongs, songEntry.name, 'Info.dat')
+      const songDirPath = pathJoin(storeConfig.pathSongs, songEntry.name)
+      const songInfoPath = pathJoin(songDirPath, 'Info.dat')
 
       const songInfoExists = await syncUse.pathExists(songInfoPath)
       if (!songInfoExists) {
         loggerPush('Warn: Song Info.dat not found', songInfoPath)
         continue
       }
+
+      const hashFromCache = await storeModSongLoader.getSongHashFromPath(songDirPath)
+      /**
+       * For songs that were not loaded by SongLoader use their dirname.
+       * It is expected, that the dirname is actually the hash, as the song was most likely created by this tool.
+       * In case it was created some other way, it won't be identified correctly for playlist references.
+       */
+      const hash = hashFromCache ?? songEntry.name
 
       const reader = sync.read(songInfoPath)
       const bytes = await streamReadToBytes(reader)
@@ -45,6 +56,7 @@ export const useSongManagerStore = defineStore('songManager', () => {
         dirEntry: markRaw(songEntry),
         info,
         songTitle: `${info._songAuthorName} - ${info._songName}`,
+        hash,
       })
     }
 

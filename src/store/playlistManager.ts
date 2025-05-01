@@ -1,7 +1,8 @@
-import { decodeUtf8, LinuxFileType, type AdbSyncEntry } from '@yume-chan/adb'
-import { streamReadToBytes } from '~/lib/stream'
+import { decodeUtf8, LinuxFileType } from '@yume-chan/adb'
+import { streamFromString, streamReadToBytes } from '~/lib/stream'
 import type { PlaylistWithInfo } from '~/pages/device/playlist-manager/_partial/interface'
 import type { BeatSaberPlaylist } from '~/service/beatSaber.interface'
+import { beatSaberPlaylistGetPathFromName } from '~/service/beatSaber.service'
 import { pathJoin } from '~/service/path.service'
 import { useAdbStore } from './adb'
 import { useConfigStore } from './config'
@@ -29,7 +30,7 @@ export const usePlaylistManagerStore = defineStore('playlistManager', () => {
 
       playlistsWithInfo.push({
         dirEntry: markRaw(playlistEntry),
-        info,
+        info: markRaw(info),
         playlistTitle: info.playlistTitle,
       })
     }
@@ -37,16 +38,39 @@ export const usePlaylistManagerStore = defineStore('playlistManager', () => {
     return playlistsWithInfo
   }
 
-  const playlistsRemove = async (playlistFiles: AdbSyncEntry[]) => {
+  const playlistsRemove = async (playlistFiles: string[]) => {
     for (const playlistFile of playlistFiles) {
-      const path = pathJoin(storeConfig.pathPlaylists, playlistFile.name)
+      const path = pathJoin(storeConfig.pathPlaylists, playlistFile)
       await storeAdb.deviceAdbGetOrThrow().adb.rm(path)
     }
+  }
+
+  const playlistExistsByTitle = async (playlistTitle: string) => {
+    await using syncUse = await storeAdb.deviceAdbGetOrThrow().useSync()
+    const path = pathJoin(storeConfig.pathPlaylists, beatSaberPlaylistGetPathFromName(playlistTitle))
+    return await syncUse.pathExists(path)
+  }
+
+  const playlistSave = async (beatSaberPlaylist: BeatSaberPlaylist) => {
+    await using syncUse = await storeAdb.deviceAdbGetOrThrow().useSync()
+    const filePath = pathJoin(
+      storeConfig.pathPlaylists,
+      beatSaberPlaylistGetPathFromName(beatSaberPlaylist.playlistTitle),
+    )
+
+    await syncUse.sync.write({
+      filename: filePath,
+      file: streamFromString(JSON.stringify(beatSaberPlaylist, undefined, 2)),
+    })
+
+    await playlistsGetAll()
   }
 
   return {
     playlistsGetAll,
     playlistsRemove,
+    playlistExistsByTitle,
+    playlistSave,
   }
 })
 

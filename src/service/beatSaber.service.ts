@@ -32,4 +32,8 @@ export function sanitizeFileName(name: string): string {
   return name.split('').map(mapToSafeChar).join('')
 }
 
-export const BEAT_SABER_PLAYLIST_EXT = 'json_BMBF.json'
+export const BEAT_SABER_PLAYLIST_EXT = '.json'
+
+export const beatSaberPlaylistGetPathFromName = (name: string) => {
+  return `${sanitizeFileName(name)}${BEAT_SABER_PLAYLIST_EXT}`
+}
