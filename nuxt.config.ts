@@ -13,6 +13,7 @@ export default defineNuxtConfig({
     '@nuxt/test-utils',
     '@nuxt/ui',
     '@pinia/nuxt',
+    '@sentry/nuxt/module',
   ],
 
   css: ['~/assets/css/main.css'],
@@ -54,6 +55,16 @@ export default defineNuxtConfig({
     public: {
       hrefGit: 'https://github.com/veselj43/lazy-songs',
       showFileExplorer: false,
+
+      posthog: {
+        publicKey: 'phc_T2gBIk4PxumJKJcUWmCHCXFhXkq6OLmJFJ1bZcWCffs',
+        host: 'https://eu.i.posthog.com',
+      },
+      sentry: {
+        dsn:
+          process.env.SENTRY_DSN_PUBLIC ??
+          'https://4a0cd8e8e183acab3127a248ea717e7c@o339977.ingest.us.sentry.io/4509247668944896',
+      },
     },
   },
 })
