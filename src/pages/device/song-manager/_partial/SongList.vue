@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { UCheckbox } from '#components'
+import { UButton, UCheckbox } from '#components'
 import type { TableColumn } from '@nuxt/ui'
 import type { Table } from '@tanstack/vue-table'
 import AppHeader from '~/components/AppHeader.vue'
 import AppModalConfirm from '~/components/AppModalConfirm.vue'
+import { getHeaderSort } from '~/components/table/sortHelper'
 import { useAsyncAction } from '~/lib/asyncAction'
+import { dateFromUnixTimestamp } from '~/service/date.service'
 import { useSongManagerStore } from '~/store/songManager'
 import type { SongWithInfo } from './interface'
 
@@ -18,6 +20,8 @@ const songsDirFilesWithInfo = useAsyncAction((options: { force?: boolean }) => s
 const columns: TableColumn<SongWithInfo>[] = [
   {
     id: 'select',
+    enableSorting: false,
+    enableHiding: false,
     header: ({ table }) =>
       h(UCheckbox, {
         modelValue: table.getIsSomePageRowsSelected() ? 'indeterminate' : table.getIsAllPageRowsSelected(),
@@ -30,19 +34,26 @@ const columns: TableColumn<SongWithInfo>[] = [
         'onUpdate:modelValue': (value: boolean | 'indeterminate') => row.toggleSelected(!!value),
         'aria-label': 'Select row',
       }),
-    enableSorting: false,
-    enableHiding: false,
   },
   {
     accessorKey: 'songTitle',
-    header: 'Song title',
+    enableSorting: true,
+    header: getHeaderSort('Song title'),
   },
   {
-    accessorKey: 'songAuthor',
-    header: 'Map author',
+    id: 'songAuthor',
+    accessorFn: (row) => row.info._levelAuthorName,
+    enableSorting: true,
+    header: getHeaderSort('Map author'),
+  },
+  {
+    id: 'created',
+    accessorFn: (row) => row.dirEntry.ctime,
+    enableSorting: true,
+    header: getHeaderSort('Created'),
     cell: ({ row }) => {
-      const songInfo = row.original.info
-      return songInfo._levelAuthorName
+      const date = dateFromUnixTimestamp(row.original.dirEntry.ctime)
+      return date ? date.toLocaleDateString() : '---'
     },
   },
 ]

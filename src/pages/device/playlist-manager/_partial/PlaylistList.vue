@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { UCheckbox } from '#components'
+import { UButton, UCheckbox } from '#components'
 import type { TableColumn } from '@nuxt/ui'
 import type { Table } from '@tanstack/vue-table'
 import AppHeader from '~/components/AppHeader.vue'
 import AppModalConfirm from '~/components/AppModalConfirm.vue'
+import { getHeaderSort } from '~/components/table/sortHelper'
 import { useAsyncAction } from '~/lib/asyncAction'
+import { dateFromUnixTimestamp } from '~/service/date.service'
 import { usePlaylistManagerStore } from '~/store/playlistManager'
 import type { PlaylistWithInfo } from './interface'
 
@@ -18,6 +20,8 @@ const playlistDirFilesWithInfo = useAsyncAction(() => storePlaylistManager.playl
 const columns: TableColumn<PlaylistWithInfo>[] = [
   {
     id: 'select',
+    enableSorting: false,
+    enableHiding: false,
     header: ({ table }) =>
       h(UCheckbox, {
         modelValue: table.getIsSomePageRowsSelected() ? 'indeterminate' : table.getIsAllPageRowsSelected(),
@@ -30,27 +34,42 @@ const columns: TableColumn<PlaylistWithInfo>[] = [
         'onUpdate:modelValue': (value: boolean | 'indeterminate') => row.toggleSelected(!!value),
         'aria-label': 'Select row',
       }),
-    enableSorting: false,
-    enableHiding: false,
   },
   {
     accessorKey: 'playlistTitle',
-    header: 'Song title',
+    enableSorting: true,
+    header: getHeaderSort('Song title'),
   },
   {
-    accessorKey: 'songAuthor',
-    header: 'Playlist author',
-    cell: ({ row }) => {
-      const playlistInfo = row.original.info
-      return playlistInfo.playlistAuthor
-    },
+    id: 'songAuthor',
+    accessorFn: (row) => row.info.playlistAuthor,
+    enableSorting: true,
+    header: getHeaderSort('Playlist author'),
   },
   {
     id: 'songCount',
-    header: 'Songs',
+    accessorFn: (row) => row.info.songs.length,
+    enableSorting: true,
+    header: getHeaderSort('Songs'),
+  },
+  {
+    id: 'created',
+    accessorFn: (row) => row.dirEntry.ctime,
+    enableSorting: true,
+    header: getHeaderSort('Created'),
     cell: ({ row }) => {
-      const playlistInfo = row.original.info
-      return playlistInfo.songs.length
+      const date = dateFromUnixTimestamp(row.original.dirEntry.ctime)
+      return date ? date.toLocaleDateString() : '---'
+    },
+  },
+  {
+    id: 'updated',
+    accessorFn: (row) => row.dirEntry.mtime,
+    enableSorting: true,
+    header: getHeaderSort('Updated'),
+    cell: ({ row }) => {
+      const date = dateFromUnixTimestamp(row.original.dirEntry.mtime)
+      return date ? date.toLocaleDateString() : '---'
     },
   },
 ]
