@@ -6,6 +6,10 @@ import ConfigUpdate from './_partial/ConfigUpdate.vue'
 definePageMeta({
   middleware: [middlewareAdbDeviceCheck],
 })
+
+useHead({
+  title: 'Settings',
+})
 </script>
 
 <template>

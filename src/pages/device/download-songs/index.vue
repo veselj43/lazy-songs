@@ -6,6 +6,10 @@ import PlaylistDownload from './_partial/PlaylistDownload.vue'
 definePageMeta({
   middleware: [middlewareAdbDeviceCheck],
 })
+
+useHead({
+  title: 'Download songs',
+})
 </script>
 
 <template>

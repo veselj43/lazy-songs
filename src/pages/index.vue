@@ -55,7 +55,20 @@ const isBrowserSupported = computed(() => !!Symbol.asyncDispose && !!storeAdb.ha
         />
       </div>
 
-      <DeviceSelect v-else />
+      <template v-else>
+        <UAlert
+          variant="soft"
+          color="info"
+          icon="i-lucide:info"
+          :ui="{
+            icon: 'mt-0.5 text-base',
+          }"
+          title="All data (mostly files in this app) is handled locally in your browser."
+          description="I collect only anonymous data about errors and page visits to help with maintenance and future development."
+        />
+
+        <DeviceSelect />
+      </template>
     </div>
 
     <div class="absolute right-0 bottom-0 p-4">

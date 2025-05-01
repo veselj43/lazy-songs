@@ -7,6 +7,10 @@ import AdbFileExplorer from './_partial/AdbFileExplorer.vue'
 definePageMeta({
   middleware: [middlewareAdbDeviceCheck],
 })
+
+useHead({
+  title: 'File explorer',
+})
 </script>
 
 <template>

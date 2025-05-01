@@ -6,6 +6,10 @@ import PlaylistList from './_partial/PlaylistList.vue'
 definePageMeta({
   middleware: [middlewareAdbDeviceCheck],
 })
+
+useHead({
+  title: 'Playlist manager',
+})
 </script>
 
 <template>

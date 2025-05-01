@@ -7,6 +7,10 @@ import SongList from './_partial/SongList.vue'
 definePageMeta({
   middleware: [middlewareAdbDeviceCheck],
 })
+
+useHead({
+  title: 'Song manager',
+})
 </script>
 
 <template>
