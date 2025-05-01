@@ -1,5 +1,7 @@
 Lazy Songs is SPA for managing BeatSaber custom songs (maps) and playlists.
 
+App here: [LazySongs.xyz](https://lazysongs.xyz/).
+
 Inspired by [ModsBeforeFriday](https://github.com/Lauriethefish/ModsBeforeFriday) with WebUSB and ADB approach.
 
 # Core technology

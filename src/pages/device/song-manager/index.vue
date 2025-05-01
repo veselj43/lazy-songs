@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import AdbProvider from '~/components/AdbProvider.vue'
 import { middlewareAdbDeviceCheck } from '~/pages/_partial/adb.middleware'
 import LayoutMain from '~/pages/_partial/LayoutMain.vue'
 import SongList from './_partial/SongList.vue'
@@ -15,8 +14,6 @@ useHead({
 
 <template>
   <LayoutMain>
-    <AdbProvider>
-      <SongList />
-    </AdbProvider>
+    <SongList />
   </LayoutMain>
 </template>
