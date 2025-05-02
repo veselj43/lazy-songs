@@ -9,19 +9,22 @@ import { useConfigStore } from '~/store/config'
 const storeConfig = useConfigStore()
 const storeAdb = useAdbStore()
 
+const formDataGetDefault = (): FormSchema => {
+  return {
+    pathPlaylists: storeConfig.pathPlaylists,
+    pathSongDataCache: storeConfig.pathSongDataCache,
+    pathSongs: storeConfig.pathSongs,
+  }
+}
+
 const formSchema = z.object({
   pathPlaylists: z.string(),
   pathSongDataCache: z.string(),
   pathSongs: z.string(),
 })
-
 type FormSchema = z.output<typeof formSchema>
 
-const formState = reactive<Partial<FormSchema>>({
-  pathPlaylists: storeConfig.pathPlaylists,
-  pathSongDataCache: storeConfig.pathSongDataCache,
-  pathSongs: storeConfig.pathSongs,
-})
+const formState = ref(formDataGetDefault())
 
 const formSubmit = useAsyncAction(async (event: FormSubmitEvent<FormSchema>) => {
   storeConfig.pathsSet({
@@ -35,6 +38,7 @@ const resetToDefaults = () => {
   if (!storeAdb.device?.device) return
 
   storeConfig.resetForDevice(storeAdb.device.device)
+  formState.value = formDataGetDefault()
 }
 </script>
 
@@ -45,7 +49,7 @@ const resetToDefaults = () => {
 
       <template #right>
         <UButton
-          variant="ghost"
+          variant="soft"
           color="warning"
           @click="resetToDefaults()"
           >Reset</UButton
@@ -92,6 +96,7 @@ const resetToDefaults = () => {
 
         <div>
           <UButton
+            variant="subtle"
             type="submit"
             :loading="formSubmit.status.value === 'pending'"
             >Save</UButton

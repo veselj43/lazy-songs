@@ -78,7 +78,7 @@ onBeforeMount(() => {
           <tr
             v-for="usbDevice in deviceList"
             :key="usbDevice.name"
-            class="hover:bg-neutral-600/25"
+            class="transition-[background-color] hover:bg-neutral-600/25"
           >
             <td
               class="px-4 py-2"
