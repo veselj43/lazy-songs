@@ -11,10 +11,10 @@ export type BeatSaberPlaylistSong = z.infer<typeof schemaBeatSabePlaylistSong>
 
 export const schemaBeatSaberPlaylist = z.object({
   playlistDescription: z.string().optional().nullable(),
-  playlistAuthor: z.string().optional(),
+  playlistAuthor: z.string().optional().nullable(),
   playlistTitle: z.string().min(1),
   songs: z.array(schemaBeatSabePlaylistSong),
-  imageString: z.string().optional(),
+  imageString: z.string().optional().nullable(),
 })
 export type BeatSaberPlaylist = z.infer<typeof schemaBeatSaberPlaylist>
 

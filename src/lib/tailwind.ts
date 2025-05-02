@@ -31,7 +31,7 @@ const customTwMerge = extendTailwindMerge(tailwindMergeConfig)
  * - removes class conflicts - keeps the latest in given order (tailwind-merge)
  * - supports conditions (clsx)
  */
-export const tvcn = (...inputs: ClassValue[]) => {
+export const tvCn = (...inputs: ClassValue[]) => {
   return customTwMerge(clsx(inputs))
 }
 

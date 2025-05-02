@@ -21,7 +21,8 @@ export default defineNuxtConfig({
   srcDir: 'src/',
 
   components: {
-    global: false,
+    dirs: ['components'],
+    generateMetadata: true,
   },
 
   experimental: {

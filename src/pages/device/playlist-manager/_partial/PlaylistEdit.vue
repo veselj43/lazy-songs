@@ -1,18 +1,19 @@
 <script setup lang="ts">
 import type { TableColumn } from '@nuxt/ui'
 import type { Table } from '@tanstack/vue-table'
-import type { z } from 'zod'
+import { z } from 'zod'
 import { useConfirm } from '~/components/confirmHelper'
 import { getTableSelectColumn } from '~/components/table/selectHelper'
 import { getHeaderSort } from '~/components/table/sortHelper'
 import { useAsyncAction } from '~/lib/asyncAction'
-import { tcf } from '~/lib/tailwind'
 import {
   schemaBeatSaberPlaylist,
   type BeatSaberPlaylist,
   type BeatSaberPlaylistSong,
 } from '~/service/beatSaber.interface'
+import { beatSaberPlaylistImageFromFile } from '~/service/beatSaber.service'
 import { dateFromUnixTimestamp } from '~/service/date.service'
+import { fileGetBase64ImgUrl } from '~/service/fileManipulation.service'
 import type { SongWithInfo } from '~/service/uiBeatSaber.interface'
 import { usePlaylistManagerStore } from '~/store/playlistManager'
 import { useSongManagerStore } from '~/store/songManager'
@@ -82,17 +83,25 @@ const rowSelection = computed(() => {
   return Object.fromEntries(songs.map((song) => [song.hash, true]))
 })
 
-const formSchema = schemaBeatSaberPlaylist.omit({
-  playlistDescription: true,
-  songs: true,
-})
+const formSchema = schemaBeatSaberPlaylist
+  .omit({
+    playlistDescription: true,
+    songs: true,
+    imageString: true,
+  })
+  .extend({
+    image: z
+      .union([schemaBeatSaberPlaylist.shape.imageString, z.instanceof(File)])
+      .optional()
+      .nullable(),
+  })
 
 type FormSchema = z.output<typeof formSchema>
 
 const formState = reactive<FormSchema>({
   playlistTitle: props.playlist?.info?.playlistTitle ?? 'New playlist',
   playlistAuthor: props.playlist?.info?.playlistAuthor ?? '',
-  imageString: props.playlist?.info?.imageString ?? '',
+  image: fileGetBase64ImgUrl(props.playlist?.info?.imageString),
 })
 
 const playlistSaveAction = useAsyncAction(async () => {
@@ -110,12 +119,13 @@ const playlistSaveAction = useAsyncAction(async () => {
   })
 
   const playlistDataOld = props.playlist?.info
+  const imageString = await beatSaberPlaylistImageFromFile(formState.image)
 
   const playlistDataNew: BeatSaberPlaylist = {
     playlistTitle: formState.playlistTitle,
     playlistAuthor: formState.playlistAuthor,
     playlistDescription: playlistDataOld?.playlistDescription ?? null,
-    imageString: formState.imageString || undefined,
+    imageString,
     songs: playlistSongItems,
   }
 
@@ -161,6 +171,14 @@ onBeforeMount(() => {
         @submit="playlistSaveAction.execute()"
       >
         <div class="flex gap-4">
+          <UFormField>
+            <InputFileImage
+              v-model="formState.image"
+              class="size-20"
+              accept="image/*"
+            />
+          </UFormField>
+
           <UFormField
             label="Playlist name"
             name="playlistTitle"

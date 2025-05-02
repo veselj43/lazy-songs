@@ -1,5 +1,6 @@
 import type { BeatSaberPlaylist } from './beatSaber.interface'
 import type { BeatSaverPlaylist } from './beatSaver.interface'
+import { fileGetBase64Data, fileReadFromInput } from './fileManipulation.service'
 import { pathJoin } from './path.service'
 
 export function getBeatSaberSongInfoPath(songDirPath: string) {
@@ -36,4 +37,20 @@ export const BEAT_SABER_PLAYLIST_EXT = '.json'
 
 export const beatSaberPlaylistGetPathFromName = (name: string) => {
   return `${sanitizeFileName(name)}${BEAT_SABER_PLAYLIST_EXT}`
+}
+
+export const beatSaberPlaylistImageFromFile = async (
+  input: File | string | null | undefined,
+): Promise<string | null> => {
+  if (typeof input === 'string') {
+    return input
+  }
+
+  if (input instanceof File) {
+    const base64Img = await fileReadFromInput(input)
+    const base64Data = fileGetBase64Data(base64Img)
+    return base64Data
+  }
+
+  return null
 }
