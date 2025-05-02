@@ -4,10 +4,12 @@ import type { ButtonProps } from '@nuxt/ui'
 withDefaults(
   defineProps<{
     title?: string
+    description?: string
     confirmColor?: ButtonProps['color']
   }>(),
   {
     title: undefined,
+    description: undefined,
     confirmColor: 'error',
   },
 )
@@ -48,7 +50,15 @@ defineExpose({
     :open="isOpen"
     :close="{ onClick: () => close(false) }"
     :title="title"
+    :description="description"
   >
+    <template
+      v-if="$slots.body"
+      #body
+    >
+      <slot name="body" />
+    </template>
+
     <template #footer>
       <div class="flex gap-2">
         <UButton

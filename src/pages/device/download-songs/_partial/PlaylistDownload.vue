@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AppHeader from '~/components/AppHeader.vue'
+import { useConfirm } from '~/components/confirmHelper'
 import { useAsyncAction } from '~/lib/asyncAction'
 import { tryCatchSync } from '~/lib/error'
 import { schemaBeatSavePlaylist, type BeatSaverPlaylist } from '~/service/beatSaver.interface'
@@ -7,11 +8,20 @@ import { loggerPush } from '~/service/logger.service'
 import { usePlaylistDownloadStore } from '~/store/playlistDownload'
 import SongStatusIcon from './DownloadStatusIcon.vue'
 
+const { confirm } = useConfirm()
 const storePlaylist = usePlaylistDownloadStore()
 const fileBplistRef = ref<{ inputRef: HTMLInputElement }>()
 
 const downloadAction = useAsyncAction(() => storePlaylist.download())
-const createAction = useAsyncAction(() => storePlaylist.create())
+const createAction = useAsyncAction(async () => {
+  const exists = await storePlaylist.exists()
+  if (exists) {
+    const overwrite = await confirm({ title: 'Overwrite?', description: 'Playlist already exists.' })
+    if (!overwrite) return
+  }
+
+  await storePlaylist.create()
+})
 
 const playlistDataSet = async (value?: BeatSaverPlaylist) => {
   await storePlaylist.currentDataSet(value)

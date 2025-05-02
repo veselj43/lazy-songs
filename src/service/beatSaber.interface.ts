@@ -10,9 +10,9 @@ export const schemaBeatSabePlaylistSong = z.object({
 export type BeatSaberPlaylistSong = z.infer<typeof schemaBeatSabePlaylistSong>
 
 export const schemaBeatSaberPlaylist = z.object({
-  playlistDescription: z.string().optional(),
+  playlistDescription: z.string().optional().nullable(),
   playlistAuthor: z.string().optional(),
-  playlistTitle: z.string(),
+  playlistTitle: z.string().min(1),
   songs: z.array(schemaBeatSabePlaylistSong),
   imageString: z.string().optional(),
 })

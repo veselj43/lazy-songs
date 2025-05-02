@@ -32,12 +32,10 @@ export const useModSongLoaderStore = defineStore('modSongLoader', () => {
     const text = decodeUtf8(bytes)
     cachedSongData.value = JSON.parse(text) as SongLoaderCachedSongData
 
-    console.log(cachedSongData.value)
-
     return cachedSongData.value
   }
 
-  const checkSongExistsInCache = async (songHash: string): Promise<boolean | undefined> => {
+  const checkSongExistsInCache = async (songHash: string) => {
     const cachedSongData = await getCachedSongData()
     if (!cachedSongData) return
 
@@ -55,7 +53,7 @@ export const useModSongLoaderStore = defineStore('modSongLoader', () => {
     return exists
   }
 
-  const checkSongExists = async (songHash: string) => {
+  const checkSongExists = async (songHash: string): Promise<boolean | undefined> => {
     const existsInCache = await checkSongExistsInCache(songHash)
     if (existsInCache) return true
 
@@ -65,8 +63,17 @@ export const useModSongLoaderStore = defineStore('modSongLoader', () => {
     return false
   }
 
+  const getSongHashFromPath = async (path: string): Promise<string | undefined> => {
+    const cachedSongData = await getCachedSongData()
+    if (!cachedSongData) return
+
+    const songCachedEntry = cachedSongData[path]
+    return songCachedEntry ? songCachedEntry.sha1.toLowerCase() : undefined
+  }
+
   return {
     checkSongExists,
+    getSongHashFromPath,
   }
 })
 
