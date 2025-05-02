@@ -96,7 +96,7 @@ onBeforeMount(() => {
       </template>
     </AppHeader>
 
-    <div class="flex items-center gap-4">
+    <div class="flex items-center justify-between gap-4">
       <UInput
         class="max-w-sm min-w-[25ch]"
         placeholder="Filter songs..."
