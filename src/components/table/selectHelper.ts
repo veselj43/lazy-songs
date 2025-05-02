@@ -22,7 +22,10 @@ export const getTableSelectCell =
 
 export const getTableSelectColumn = <TData = unknown>(overrides?: Partial<TableColumn<TData>>): TableColumn<TData> => {
   return {
-    id: 'select',
+    id: 'selected',
+    filterFn: (row, col, filter) => {
+      return filter && row.getIsSelected()
+    },
     enableSorting: false,
     enableHiding: false,
     header: getTableSelectHeader(),

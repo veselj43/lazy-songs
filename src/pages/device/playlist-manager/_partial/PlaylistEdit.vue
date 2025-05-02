@@ -59,12 +59,21 @@ const columns: TableColumn<SongWithInfo>[] = [
   },
 ]
 
-const inputFilter = computed(() => {
+const tableFilterSelected = computed(() => {
+  const filterValue = table.value?.tableApi?.getColumn('selected')?.getFilterValue()
+  return !!filterValue
+})
+
+const tableFilterSelectedUpdate = (val: boolean) => {
+  table.value?.tableApi?.getColumn('selected')?.setFilterValue(val || undefined)
+}
+
+const tableFilterSongTitle = computed(() => {
   const filterValue = table.value?.tableApi?.getColumn('songTitle')?.getFilterValue()
   return typeof filterValue === 'string' ? filterValue : ''
 })
 
-const inputFilterUpdate = (val: string) => {
+const tableFilterSongTitleUpdate = (val: string) => {
   table.value?.tableApi?.getColumn('songTitle')?.setFilterValue(val)
 }
 
@@ -140,11 +149,8 @@ onBeforeMount(() => {
 
 <template>
   <UModal
-    class="flex min-w-5xl flex-col gap-2 divide-none lg:max-w-11/12 xl:max-w-8/12"
+    class="flex h-[95vh] min-w-5xl flex-col gap-2 divide-none lg:max-w-11/12 xl:max-w-8/12"
     :dismissible="false"
-    :ui="{
-      body: tcf('overflow-y-hidden h-[95vh] '),
-    }"
     description="Playlist editor"
   >
     <template #content>
@@ -197,16 +203,16 @@ onBeforeMount(() => {
         </div>
       </UForm>
 
-      <div class="flex items-center justify-between gap-2 px-6 pt-4">
+      <div class="flex items-center gap-4 px-6 pt-4">
         <UInput
           class="max-w-sm min-w-[25ch]"
           placeholder="Filter songs..."
           autofocus
-          :modelValue="inputFilter"
-          @update:modelValue="inputFilterUpdate"
+          :modelValue="tableFilterSongTitle"
+          @update:modelValue="tableFilterSongTitleUpdate"
         >
           <template
-            v-if="inputFilter"
+            v-if="tableFilterSongTitle"
             #trailing
           >
             <UButton
@@ -215,10 +221,16 @@ onBeforeMount(() => {
               size="sm"
               icon="i-lucide:x"
               aria-label="Clear input"
-              @click="inputFilterUpdate('')"
+              @click="tableFilterSongTitleUpdate('')"
             />
           </template>
         </UInput>
+
+        <UCheckbox
+          label="Show only selected"
+          :modelValue="tableFilterSelected"
+          @update:modelValue="tableFilterSelectedUpdate"
+        />
       </div>
 
       <UTable

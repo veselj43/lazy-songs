@@ -43,12 +43,12 @@ const columns: TableColumn<SongWithInfo>[] = [
   },
 ]
 
-const inputFilter = computed(() => {
+const tableFilterSongTitle = computed(() => {
   const filterValue = table.value?.tableApi?.getColumn('songTitle')?.getFilterValue()
   return typeof filterValue === 'string' ? filterValue : ''
 })
 
-const inputFilterUpdate = (val: string) => {
+const tableFilterSongTitleUpdate = (val: string) => {
   table.value?.tableApi?.getColumn('songTitle')?.setFilterValue(val)
 }
 
@@ -96,15 +96,15 @@ onBeforeMount(() => {
       </template>
     </AppHeader>
 
-    <div class="flex items-center justify-between gap-2">
+    <div class="flex items-center gap-4">
       <UInput
         class="max-w-sm min-w-[25ch]"
         placeholder="Filter songs..."
-        :modelValue="inputFilter"
-        @update:modelValue="inputFilterUpdate"
+        :modelValue="tableFilterSongTitle"
+        @update:modelValue="tableFilterSongTitleUpdate"
       >
         <template
-          v-if="inputFilter"
+          v-if="tableFilterSongTitle"
           #trailing
         >
           <UButton
@@ -113,7 +113,7 @@ onBeforeMount(() => {
             size="sm"
             icon="i-lucide:x"
             aria-label="Clear input"
-            @click="inputFilterUpdate('')"
+            @click="tableFilterSongTitleUpdate('')"
           />
         </template>
       </UInput>
