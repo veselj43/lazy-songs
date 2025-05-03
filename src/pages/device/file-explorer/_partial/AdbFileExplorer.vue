@@ -93,7 +93,12 @@ const fileRead = async (dirEntry: DirEntry) => {
         <div>{{ dirPathCurrent }}</div>
       </template>
       <template #right>
-        <UButton @click="dirPathCurrent = '/'">Go to root</UButton>
+        <UButton
+          variant="subtle"
+          color="secondary"
+          @click="dirPathCurrent = '/'"
+          >Go to root</UButton
+        >
       </template>
     </AppHeader>
 
@@ -141,12 +146,12 @@ const fileRead = async (dirEntry: DirEntry) => {
             <td>
               <div class="flex items-center justify-end">
                 <UButton
-                  v-if="entry.type === 'file'"
+                  v-if="entry.type === 'file' && entry.size < 1_000_000n"
                   variant="ghost"
-                  size="sm"
+                  color="neutral"
+                  icon="i-lucide:eye"
                   @click="fileRead(entry)"
-                  >Read</UButton
-                >
+                />
               </div>
             </td>
           </tr>

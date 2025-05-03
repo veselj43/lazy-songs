@@ -17,6 +17,7 @@
     "@pinia/nuxt": "0.11.0",
     "@sentry/nuxt": "^9.15.0",
     "@tanstack/vue-table": "^8.21.3",
+    "@vueuse/core": "^13.1.0",
     "@yume-chan/adb": "^2.0.1",
     "@yume-chan/adb-credential-web": "^2.0.1",
     "@yume-chan/adb-daemon-webusb": "^2.0.1",
