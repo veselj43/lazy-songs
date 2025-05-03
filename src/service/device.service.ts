@@ -27,12 +27,12 @@ export const devicePathsResolve = (device: AdbDaemonWebUsbDevice): DevicePaths =
     }
   }
 
-  if (vendorId === 10007 && productId === 65288) {
+  if (vendorId === 10007 && (productId === 65288 || productId === 65352)) {
     // Android device used for testing
     return {
-      pathPlaylists: '/storage/self/primary/_test/playlists',
-      pathSongDataCache: '/storage/self/primary/_test/CachedSongData.json',
-      pathSongs: '/storage/self/primary/_test/songs',
+      pathPlaylists: '/sdcard/_test/playlists',
+      pathSongDataCache: '/sdcard/_test/CachedSongData.json',
+      pathSongs: '/sdcard/_test/songs',
     }
   }
 
