@@ -12,14 +12,14 @@ const items = ref<NavigationMenuItem[][]>([
       to: '/device/download-songs',
     },
     {
-      label: 'Song manager',
-      icon: 'i-lucide:file-music',
-      to: '/device/song-manager',
-    },
-    {
       label: 'Playlist manager',
       icon: 'i-lucide:file-stack',
       to: '/device/playlist-manager',
+    },
+    {
+      label: 'Song manager',
+      icon: 'i-lucide:file-music',
+      to: '/device/song-manager',
     },
 
     ...(config.public.showFileExplorer

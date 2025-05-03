@@ -64,7 +64,7 @@ const fileLoadAction = useAsyncAction(async () => {
 
 <template>
   <div>
-    <AppHeader>Download playlist</AppHeader>
+    <AppHeader>Download songs from playlist</AppHeader>
 
     <p class="mb-4">
       Download any playlist from
