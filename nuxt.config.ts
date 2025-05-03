@@ -69,6 +69,7 @@ export default defineNuxtConfig({
       showFileExplorer: false,
 
       posthog: {
+        disabled: isDev,
         publicKey: 'phc_T2gBIk4PxumJKJcUWmCHCXFhXkq6OLmJFJ1bZcWCffs',
         host: 'https://eu.i.posthog.com',
       },

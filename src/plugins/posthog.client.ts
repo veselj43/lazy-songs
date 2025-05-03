@@ -3,6 +3,8 @@ import posthog from 'posthog-js'
 
 export default defineNuxtPlugin((nuxtApp) => {
   const configPosthog = nuxtApp.$config.public.posthog
+  if (configPosthog.disabled) return
+
   const posthogClient = posthog.init(configPosthog.publicKey, {
     api_host: configPosthog.host,
     person_profiles: 'never',
