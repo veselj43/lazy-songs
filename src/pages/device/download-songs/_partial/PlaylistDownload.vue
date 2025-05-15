@@ -3,6 +3,7 @@ import AppHeader from '~/components/AppHeader.vue'
 import { useConfirm } from '~/components/confirmHelper'
 import { useAsyncAction } from '~/lib/asyncAction'
 import { tryCatchSync } from '~/lib/error'
+import { tvCn } from '~/lib/tailwind'
 import { schemaBeatSavePlaylist, type BeatSaverPlaylist } from '~/service/beatSaver.interface'
 import { loggerPush } from '~/service/logger.service'
 import { usePlaylistDownloadStore } from '~/store/playlistDownload'
@@ -10,7 +11,8 @@ import SongStatusIcon from './DownloadStatusIcon.vue'
 
 const { confirm } = useConfirm()
 const storePlaylist = usePlaylistDownloadStore()
-const fileBplistRef = ref<{ inputRef: HTMLInputElement }>()
+const fileBplistRef = shallowRef<{ inputRef: HTMLInputElement }>()
+const fileError = shallowRef(false)
 
 const downloadAction = useAsyncAction(() => storePlaylist.download())
 const createAction = useAsyncAction(async () => {
@@ -34,9 +36,16 @@ playlistDataSet()
 
 const fileLoadAction = useAsyncAction(async () => {
   const file = fileBplistRef.value?.inputRef?.files?.[0]
+  fileError.value = false
 
   if (!file) {
     playlistDataSet(undefined)
+    return
+  }
+
+  if (file.type !== '' && !file.type.includes('bplist') && !file.type.includes('json')) {
+    playlistDataSet(undefined)
+    fileError.value = true
     return
   }
 
@@ -45,6 +54,7 @@ const fileLoadAction = useAsyncAction(async () => {
 
   if (errParse) {
     playlistDataSet(undefined)
+    fileError.value = true
     loggerPush('Pase error', errParse.name, errParse.message)
     return
   }
@@ -83,7 +93,7 @@ const fileLoadAction = useAsyncAction(async () => {
           ref="fileBplistRef"
           class="w-full"
           :ui="{
-            base: 'cursor-pointer',
+            base: tvCn('cursor-pointer', fileError && 'ring-error'),
           }"
           type="file"
           accept=".bplist"
@@ -91,6 +101,13 @@ const fileLoadAction = useAsyncAction(async () => {
           loadingAuto
           @change="fileLoadAction.execute()"
         />
+
+        <div
+          v-if="fileError"
+          class="text-error p-1 text-sm"
+        >
+          Unable to load file content.
+        </div>
       </div>
 
       <div
