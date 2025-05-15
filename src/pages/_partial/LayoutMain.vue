@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { tv, type VariantProps } from 'tailwind-variants'
 import AppSidebar from '~/components/AppSidebar.vue'
+import { useKeybinds } from '~/lib/useKeybinds'
+
+const router = useRouter()
 
 const tvLayout = tv({
   slots: {
@@ -38,6 +41,14 @@ const props = withDefaults(
 )
 
 const styles = computed(() => tvLayout(props))
+
+onMounted(() => {
+  useKeybinds({
+    'meta_KeyK-meta_KeyE': () => {
+      router.push('/device/file-explorer')
+    },
+  })
+})
 </script>
 
 <template>
