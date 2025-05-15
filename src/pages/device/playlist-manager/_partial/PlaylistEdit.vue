@@ -129,18 +129,17 @@ const playlistSaveAction = useAsyncAction(async () => {
     songs: playlistSongItems,
   }
 
-  const nameChanged = playlistDataNew.playlistTitle !== playlistDataOld?.playlistTitle
+  // Android FS is case insensitive, but preserves case from last write
+  const nameChanged = playlistDataNew.playlistTitle.toLowerCase() !== playlistDataOld?.playlistTitle?.toLowerCase()
+  const nameChangedCaseOnly = !nameChanged && playlistDataNew.playlistTitle !== playlistDataOld?.playlistTitle
+  const exists = await storePlaylistManager.playlistExistsByTitle(playlistDataNew.playlistTitle)
 
-  if (!props.playlist || nameChanged) {
-    const exists = await storePlaylistManager.playlistExistsByTitle(playlistDataNew.playlistTitle)
-
-    if (exists) {
-      const overwrite = await confirm({
-        title: `Overwrite?`,
-        description: `Playlist with name ${playlistDataNew.playlistTitle} already exists.`,
-      })
-      if (!overwrite) return
-    }
+  if (exists && !nameChangedCaseOnly) {
+    const overwrite = await confirm({
+      title: `Overwrite?`,
+      description: `Playlist with name ${playlistDataNew.playlistTitle} already exists.`,
+    })
+    if (!overwrite) return
   }
 
   await storePlaylistManager.playlistSave(playlistDataNew)
