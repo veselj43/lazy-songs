@@ -65,7 +65,7 @@ const tableFilterSelected = computed(() => {
   return !!filterValue
 })
 
-const tableFilterSelectedUpdate = (val: boolean) => {
+const tableFilterSelectedUpdate = (val: boolean | 'indeterminate') => {
   table.value?.tableApi?.getColumn('selected')?.setFilterValue(val || undefined)
 }
 
