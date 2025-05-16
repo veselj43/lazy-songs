@@ -6,6 +6,7 @@ import { useConfirm } from '~/components/confirmHelper'
 import { getTableSelectColumn } from '~/components/table/selectHelper'
 import { getHeaderSort } from '~/components/table/sortHelper'
 import { useAsyncAction } from '~/lib/asyncAction'
+import { tcf } from '~/lib/tailwind'
 import {
   schemaBeatSaberPlaylist,
   type BeatSaberPlaylist,
@@ -57,6 +58,11 @@ const columns: TableColumn<SongWithInfo>[] = [
       const date = dateFromUnixTimestamp(row.original.dirEntry.ctime)
       return date ? date.toLocaleString() : '---'
     },
+    meta: {
+      class: {
+        td: tcf('tabular-nums'),
+      },
+    },
   },
 ]
 
@@ -78,7 +84,7 @@ const tableFilterSongTitleUpdate = (val: string) => {
   table.value?.tableApi?.getColumn('songTitle')?.setFilterValue(val)
 }
 
-const rowSelection = computed(() => {
+const rowSelectionInitial = computed(() => {
   const songs = props.playlist ? props.playlist.info.songs : []
   return Object.fromEntries(songs.map((song) => [song.hash, true]))
 })
@@ -253,7 +259,7 @@ onBeforeMount(() => {
 
       <UTable
         ref="table"
-        :rowSelection="rowSelection"
+        :rowSelection="rowSelectionInitial"
         :getRowId="(row: SongWithInfo) => row.hash"
         :data="songsDirFilesWithInfo.data.value ?? undefined"
         :columns="columns"

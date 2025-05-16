@@ -7,6 +7,7 @@ import { useConfirm } from '~/components/confirmHelper'
 import { getTableSelectColumn } from '~/components/table/selectHelper'
 import { getHeaderSort } from '~/components/table/sortHelper'
 import { useAsyncAction } from '~/lib/asyncAction'
+import { tcf } from '~/lib/tailwind'
 import { dateFromUnixTimestamp } from '~/service/date.service'
 import type { SongWithInfo } from '~/service/uiBeatSaber.interface'
 import { useSongManagerStore } from '~/store/songManager'
@@ -39,6 +40,11 @@ const columns: TableColumn<SongWithInfo>[] = [
     cell: ({ row }) => {
       const date = dateFromUnixTimestamp(row.original.dirEntry.ctime)
       return date ? date.toLocaleString() : '---'
+    },
+    meta: {
+      class: {
+        td: tcf('tabular-nums'),
+      },
     },
   },
 ]

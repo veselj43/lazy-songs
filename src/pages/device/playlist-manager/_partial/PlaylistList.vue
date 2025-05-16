@@ -48,6 +48,12 @@ const columns: TableColumn<PlaylistWithInfo>[] = [
     accessorFn: (row) => row.info.songs.length,
     enableSorting: true,
     header: getHeaderSort('Songs'),
+    meta: {
+      class: {
+        th: tcf('text-right'),
+        td: tcf('text-right tabular-nums'),
+      },
+    },
   },
   {
     id: 'created',
@@ -58,6 +64,11 @@ const columns: TableColumn<PlaylistWithInfo>[] = [
       const date = dateFromUnixTimestamp(row.original.dirEntry.ctime)
       return date ? date.toLocaleString() : '---'
     },
+    meta: {
+      class: {
+        td: tcf('tabular-nums'),
+      },
+    },
   },
   {
     id: 'updated',
@@ -67,6 +78,11 @@ const columns: TableColumn<PlaylistWithInfo>[] = [
     cell: ({ row }) => {
       const date = dateFromUnixTimestamp(row.original.dirEntry.mtime)
       return date ? date.toLocaleString() : '---'
+    },
+    meta: {
+      class: {
+        td: tcf('tabular-nums'),
+      },
     },
   },
   {
