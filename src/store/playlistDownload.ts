@@ -9,6 +9,7 @@ import { useAdbStore } from './adb'
 import { useConfigStore } from './config'
 import { useModSongLoaderStore } from './modSongLoader'
 import { usePlaylistManagerStore } from './playlistManager'
+import { useSongManagerStore } from './songManager'
 
 interface SongWithStatus {
   info: BeatSaverPlaylistSong
@@ -20,6 +21,7 @@ export const usePlaylistDownloadStore = defineStore('playlistDownload', () => {
   const storeConfig = useConfigStore()
   const storeModSongLoader = useModSongLoaderStore()
   const storePlaylistManager = usePlaylistManagerStore()
+  const storeSongManager = useSongManagerStore()
 
   const currentData = ref<BeatSaverPlaylist>()
   const currentSongs = ref<SongWithStatus[]>()
@@ -105,6 +107,8 @@ export const usePlaylistDownloadStore = defineStore('playlistDownload', () => {
         song.status = status
       })
     }
+
+    storeSongManager.songsClearCache()
   }
 
   const exists = () => {

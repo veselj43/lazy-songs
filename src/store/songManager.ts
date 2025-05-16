@@ -16,8 +16,12 @@ export const useSongManagerStore = defineStore('songManager', () => {
   const songs = shallowRef<SongWithInfo[]>()
   const songsUpdated = shallowRef<number>()
 
+  const songsClearCache = () => {
+    songs.value = undefined
+  }
+
   const songsGetAll = async ({ force = false }: { force?: boolean } = {}) => {
-    if (!force && songs.value && songsUpdated.value && Date.now() - songsUpdated.value < 30 * 1_000) {
+    if (!force && songs.value && songsUpdated.value && Date.now() - songsUpdated.value < 60 * 1_000) {
       return songs.value
     }
 
@@ -74,11 +78,12 @@ export const useSongManagerStore = defineStore('songManager', () => {
 
     if (!songs.value) return
 
-    songs.value = songs.value.filter((song) => songDirs.some((songDir) => songDir.name === song.dirEntry.name))
+    songs.value = songs.value.filter((song) => !songDirs.some((songDir) => songDir.name === song.dirEntry.name))
   }
 
   return {
     songs,
+    songsClearCache,
     songsGetAll,
     songsRemove,
   }

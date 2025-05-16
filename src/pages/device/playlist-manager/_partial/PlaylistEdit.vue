@@ -220,6 +220,7 @@ onBeforeMount(() => {
             variant="subtle"
             color="success"
             icon="i-lucide:check"
+            :disabled="songsDirFilesWithInfo.status.value === 'pending'"
             :loading="playlistSaveAction.status.value === 'pending'"
             type="submit"
             >Save</UButton
