@@ -4,7 +4,7 @@ const isDev = process.env.NODE_ENV === 'development'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: '2024-11-01',
+  compatibilityDate: '2026-02-14',
 
   ssr: false,
 
@@ -19,8 +19,6 @@ export default defineNuxtConfig({
   ],
 
   css: ['~/assets/css/main.css'],
-
-  srcDir: 'src/',
 
   components: {
     dirs: ['components'],
