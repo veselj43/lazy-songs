@@ -1,11 +1,9 @@
-import { type ClassValue, clsx } from 'clsx'
-import { extendTailwindMerge } from 'tailwind-merge'
-import { defaultConfig } from 'tailwind-variants'
+import { cnMerge, defaultConfig, type ClassValue, type TWMergeConfig } from 'tailwind-variants'
 
 const colors = ['primary', 'success', 'warning', 'error', 'grey']
 
 // https://github.com/dcastil/tailwind-merge/issues/297#issuecomment-1697743051
-const tailwindMergeConfig: Parameters<typeof extendTailwindMerge>[0] = {
+const tailwindMergeConfig: TWMergeConfig = {
   extend: {
     theme: {
       colors,
@@ -24,15 +22,13 @@ const tailwindMergeConfig: Parameters<typeof extendTailwindMerge>[0] = {
 // https://www.tailwind-variants.org/docs/config#global-config
 defaultConfig.twMergeConfig = tailwindMergeConfig
 
-// https://github.com/dcastil/tailwind-merge/blob/v2.5.3/docs/configuration.md#extending-the-tailwind-merge-config
-const customTwMerge = extendTailwindMerge(tailwindMergeConfig)
-
 /**
- * - removes class conflicts - keeps the latest in given order (tailwind-merge)
- * - supports conditions (clsx)
+ * Class concat and merge.
+ * Originaly done externally by tailwind-merge and clsx.
+ * Now tailwind-merge resolves both both out of the box.
  */
 export const tvCn = (...inputs: ClassValue[]) => {
-  return customTwMerge(clsx(inputs))
+  return cnMerge(inputs)
 }
 
 /**

@@ -35,7 +35,7 @@ export default defineNuxtConfig({
     'pages:extend'(pages) {
       function removePartialPages(pages: NuxtPage[]) {
         for (let i = 0; i < pages.length; i++) {
-          const page = pages[i]
+          const page = pages[i]!
 
           if (page.path.includes('/_partial/')) {
             pages.splice(i, 1)
