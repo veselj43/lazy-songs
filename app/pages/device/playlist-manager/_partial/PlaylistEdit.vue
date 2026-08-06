@@ -100,6 +100,7 @@ const formSchema = schemaBeatSaberPlaylist
       .union([schemaBeatSaberPlaylist.shape.imageString, z.instanceof(File)])
       .optional()
       .nullable(),
+    playlistAuthor: z.string(),
   })
 
 type FormSchema = z.output<typeof formSchema>

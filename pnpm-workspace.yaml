@@ -1,10 +1,20 @@
 allowBuilds:
   '@parcel/watcher': false
+  '@sentry/cli': false
   better-sqlite3: false
+  core-js: false
   esbuild: false
+  unrs-resolver: false
   vue-demi: false
 
 # 10 days to decrease the risk of supply chain attacks
 minimumReleaseAge: 14400
+minimumReleaseAgeExclude:
+  - '@posthog/browser-common@0.4.0'
+  - '@posthog/core@1.46.8'
+  - '@posthog/types@1.402.1'
+  - '@yume-chan/adb@2.6.2'
+  - posthog-js@1.413.1
 
 trustPolicy: no-downgrade
+trustPolicyIgnoreAfter: 14400

@@ -7,7 +7,7 @@ export const getTableSelectHeader =
   ({ table }: HeaderContext<any, any>) =>
     h(UCheckbox, {
       modelValue: table.getIsSomePageRowsSelected() ? 'indeterminate' : table.getIsAllPageRowsSelected(),
-      'onUpdate:modelValue': (value: boolean | 'indeterminate') => table.toggleAllPageRowsSelected(!!value),
+      'onUpdate:modelValue': (value) => table.toggleAllPageRowsSelected(!!(value as boolean | 'indeterminate')),
       'aria-label': 'Select all',
     })
 
@@ -16,7 +16,7 @@ export const getTableSelectCell =
   ({ row }: CellContext<any, any>) =>
     h(UCheckbox, {
       modelValue: row.getIsSelected(),
-      'onUpdate:modelValue': (value: boolean | 'indeterminate') => row.toggleSelected(!!value),
+      'onUpdate:modelValue': (value) => row.toggleSelected(!!(value as boolean | 'indeterminate')),
       'aria-label': 'Select row',
     })
 
