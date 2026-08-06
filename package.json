@@ -60,5 +60,6 @@
       "name": "pnpm",
       "version": "11.7.0"
     }
-  }
+  },
+  "packageManager": "pnpm@11.7.0"
 }
