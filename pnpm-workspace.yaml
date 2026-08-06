@@ -1,0 +1,10 @@
+allowBuilds:
+  '@parcel/watcher': false
+  better-sqlite3: false
+  esbuild: false
+  vue-demi: false
+
+# 10 days to decrease the risk of supply chain attacks
+minimumReleaseAge: 14400
+
+trustPolicy: no-downgrade

@@ -21,10 +21,8 @@ export const fileReadFromInput = (file: File) => {
 }
 
 export const fileDetectImageTypeFromBase64 = (base64String: string) => {
-  // Odstraníme prefix Data URL, pokud existuje
-  const base64Data = base64String.startsWith('data:') ? base64String.split(',')[1] : base64String
+  const base64Data = base64String.startsWith('data:') ? (base64String.split(',')[1] as string) : base64String
 
-  // Převedeme Base64 na pole čísel (bytů)
   const byteString = atob(base64Data)
   const byteArray = new Uint8Array(byteString.length)
   for (let i = 0; i < byteString.length; i++) {
