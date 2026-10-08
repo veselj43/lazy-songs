@@ -10,14 +10,11 @@ allowBuilds:
 # 10 days to decrease the risk of supply chain attacks
 minimumReleaseAge: 14400
 minimumReleaseAgeExclude:
-  - '@posthog/browser-common@0.4.0'
-  - '@posthog/core@1.46.8'
-  - '@posthog/types@1.402.1'
-  - '@yume-chan/adb@2.6.2'
-  - posthog-js@1.413.1
   # Patched versions needed to resolve security advisories before the 10-day window.
   - source-map-js@1.2.2
   - shell-quote@1.11.0
+  - '@modelcontextprotocol/client@2.2.0'
+  - '@modelcontextprotocol/core@2.2.0'
 
 # Nuxt tooling still requests vulnerable versions; retain compatible patched releases.
 overrides:
