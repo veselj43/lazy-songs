@@ -16,7 +16,7 @@ export function isMacOS(nav: Navigator | undefined = defaultNavigator) {
 }
 
 function isHTMLElement(target: unknown): target is HTMLElement {
-  return (typeof target === 'object' && !!target && 'tagName' in target && !!target.tagName)
+  return typeof target === 'object' && !!target && 'tagName' in target && !!target.tagName
 }
 
 export type IncludeElement = (e: KeyboardEvent) => boolean
@@ -29,8 +29,8 @@ export const defaultIncludeEvent: IncludeElement = (e) => {
   }
 
   if (
-    ['BUTTON', 'INPUT', 'TEXTAREA'].includes(target.tagName)
-    || ['plaintext-only', 'true'].includes(target.contentEditable)
+    ['BUTTON', 'INPUT', 'TEXTAREA'].includes(target.tagName) ||
+    ['plaintext-only', 'true'].includes(target.contentEditable)
   ) {
     return false
   }
@@ -50,18 +50,16 @@ export interface CreateGetKeyCodeWithModifiersOptions {
   getKeyCode: GetKeyCode
 }
 
-export function createDefaultGetKeyCodeWithModifiers(deps: CreateGetKeyCodeWithModifiersOptions): GetKeyCodeWithModifiers {
+export function createDefaultGetKeyCodeWithModifiers(
+  deps: CreateGetKeyCodeWithModifiersOptions,
+): GetKeyCodeWithModifiers {
   return (e: KeyboardEvent): string => {
     const keyParts: string[] = []
 
-    if (e.altKey && e.key !== 'Alt')
-      keyParts.push('alt')
-    if (e.ctrlKey && e.key !== 'Control')
-      keyParts.push('ctrl')
-    if (e.metaKey && e.key !== 'Meta')
-      keyParts.push('meta')
-    if (e.shiftKey && e.key !== 'Shift')
-      keyParts.push('shift')
+    if (e.altKey && e.key !== 'Alt') keyParts.push('alt')
+    if (e.ctrlKey && e.key !== 'Control') keyParts.push('ctrl')
+    if (e.metaKey && e.key !== 'Meta') keyParts.push('meta')
+    if (e.shiftKey && e.key !== 'Shift') keyParts.push('shift')
 
     keyParts.push(deps.getKeyCode(e))
 
@@ -75,7 +73,9 @@ interface CreateNormalizeCombinedKeyCodeOptions {
 
 export type NormalizeCombinedKeyCode = (combinedKeyCode: string) => string
 
-export function createDefaultNormalizeCombinedKeyCode(deps: CreateNormalizeCombinedKeyCodeOptions): NormalizeCombinedKeyCode {
+export function createDefaultNormalizeCombinedKeyCode(
+  deps: CreateNormalizeCombinedKeyCodeOptions,
+): NormalizeCombinedKeyCode {
   if (deps.macOS) {
     return (combinedKeyCode: string) => combinedKeyCode
   }
@@ -83,7 +83,7 @@ export function createDefaultNormalizeCombinedKeyCode(deps: CreateNormalizeCombi
   return (combinedKeyCode: string) => {
     return combinedKeyCode
       .split(COMBINATION_SEPARATOR)
-      .map(keyPart => keyPart === 'meta' ? 'ctrl' : keyPart)
+      .map((keyPart) => (keyPart === 'meta' ? 'ctrl' : keyPart))
       .join(COMBINATION_SEPARATOR)
   }
 }
@@ -94,10 +94,9 @@ interface NormalizeKeybindsDefOptions {
 
 export function normalizeKeybindsDef(keybinds: KeybindsDef, { normalizeCombinedKeyCode }: NormalizeKeybindsDefOptions) {
   return Object.fromEntries(
-    Object.entries(keybinds)
-      .map(([key, value]) => {
-        return [normalizeCombinedKeyCode(key), value]
-      }),
+    Object.entries(keybinds).map(([key, value]) => {
+      return [normalizeCombinedKeyCode(key), value]
+    }),
   )
 }
 
@@ -128,8 +127,7 @@ export function buildKeybindTree(keybinds: KeybindsDef): KeybindNext {
 
       if (index + 1 === keybindSequence.length) {
         currentNode[keybind].handler = handler
-      }
-      else {
+      } else {
         if (!currentNode[keybind].next) {
           currentNode[keybind].next = {}
         }

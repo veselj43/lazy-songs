@@ -8,7 +8,7 @@ const PATH_DIR_UP = '..'
 const pathNormalizeUpDirs = (pathSegments: string[]): string[] => {
   const result = [...pathSegments]
 
-  for (let i = 1; i < result.length; ) {
+  for (let i = 1; i < result.length;) {
     if (i > 0 && result[i] === PATH_DIR_UP) {
       result.splice(i - 1, 2)
       i--

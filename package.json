@@ -11,7 +11,10 @@
     "test:watch": "vitest --watch",
     "test:unit": "vitest --project unit",
     "test:nuxt": "vitest --project nuxt",
-    "typecheck": "nuxi typecheck"
+    "typecheck": "nuxi typecheck",
+    "format": "prettier --check . --ignore-path .gitignore --ignore-path .prettierignore",
+    "lint": "eslint .",
+    "check": "pnpm typecheck && pnpm format && pnpm lint"
   },
   "dependencies": {
     "@iconify-json/lucide": "^1.2.137",
