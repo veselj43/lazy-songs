@@ -12,6 +12,9 @@ Inspired by [ModsBeforeFriday](https://github.com/Lauriethefish/ModsBeforeFriday
 
 # Setup
 
+Use Node.js 24.17 or newer and pnpm 12.10.1, as pinned in `package.json`.
+GitHub Actions installs the same pnpm version through `pnpm/action-setup`.
+
 Make sure to install dependencies:
 
 ```bash
